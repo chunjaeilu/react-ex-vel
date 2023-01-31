@@ -122,10 +122,12 @@
 - 반복되는 요소는 컴포넌트로 따로 관리하는 것이 좋다.
 - 컴포넌트를 반복해서 불러올 때는 key값이 필요한데
 - 만약 배열 안의 원소가 가지고 있는 고유값이 있다면 (id나 key속성 등) 해당 값을 key값으로 설정하면 되고
+
     `{users.map(user => (
       <User user={user} key={user.id} />
     ))}`
 - 고유한 값이 없다면 index를 참조하여 `map()`함수의 두번째인자에 넣어줄 수도 있다.
+
     `{users.map((user, index) => (
       <User user={user} key={index} />
     ))}`
