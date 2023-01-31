@@ -43,7 +43,7 @@
     name: "",
     nickname: "",
   }); // inputs 변수 useState 선언 및 초기값 설정
-  
+
   const { name, nickname } = inputs; // 비구조화 할당을 통해 값 추출(input.name 을 name으로 불러올 수 있다)
   const onChange = (e) => {
     const { value, name } = e.target; // e.target 에서 name 과 value 를 추출
@@ -55,9 +55,11 @@
     });
   };
   ```
+
   </details>
-  
+
 ### useRef로 DOM 선택하기
+
 > useRef로 초기화버튼 클릭시 input에 포커스 설정하기
 
 - vaScript에서는 DOM을 선택할 때 `querySelector`나 `getElementById` 등을 사용하지만 리액트에서 DOM을 선택할 때는 `useRef`Hook을 사용한다.
@@ -85,7 +87,7 @@
 
     nameInput.current.focus();
   };
-  
+
   return (
     <>
       <input
@@ -104,4 +106,3 @@
   ```
 
   </details>
-
