@@ -19,7 +19,6 @@ function App() {
       [name]: value,
     });
   };
-  console.log("name:" + username, "email:" + email);
 
   const [users, setUsers] = useState([
     {
@@ -41,7 +40,7 @@ function App() {
 
   // Ref로 관리할 변수 생성
   const nextId = useRef(4);
-  console.log(nextId.current);
+
   const onCreate = () => {
     // 새로운 배열 항목
     const user = {
@@ -60,6 +59,12 @@ function App() {
     nextId.current += 1;
   };
 
+  const onRemove = (id) => {
+    // filter함수를 이용, user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
+    // 결과적으로 user.id 가 id 인 것을 제거함
+    setUsers(users.filter((user) => user.id !== id));
+  };
+
   return (
     <>
       <CreateUser
@@ -68,7 +73,7 @@ function App() {
         onChange={onChange}
         onCreate={onCreate}
       />
-      <UserList2 users={users} />
+      <UserList2 users={users} onRemove={onRemove} />
     </>
   );
 }
