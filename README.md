@@ -134,16 +134,26 @@ https://react.vlpt.us/
 ### useRef로 컴포넌트 안의 변수 관리하기
 > UserList2.js, CreateUser.js
 >
-> useRef를 활용해 컴포넌트 안의 변수를 생성, 추가, 제거, 수정할 수 있다.
+> useRef를 활용해 컴포넌트 안의 변수를 생성
 
 - `useRef`Hook은 DOM을 선택하는 것 외에 컴포넌트 안에서 조회 및 수정할 수 있는 변수를 관리하는 기능이 있다. 
 - useRef로 관리되는 변수는 값이 바뀌어도 컴포넌트가 리렌더링 되지 않는다.
 - 리액트 컴포넌트에서 변수의 상태를 변경하는 함수를 호출하고 나서 리렌더링 이후에 업데이트된 상태를 조회할 수 있으나, useRef로 관리되는 변수는 렌더링 없이 설정 후 바로 조회할 수 있다.
 - Ref로 관리할 변수 생성 : `const nextId = useRef(4);`
+
+### 배열에 항목 추가하기
+> UserList2.js, CreateUser.js
+>
+> 스프레드 연산자로 배열에 새로운 항목 추가 (Create)
+> Create함수 props로 전달하고 자식 컴포넌트에서 항목 추가 요청
+> `useState`로 배열 관리
+
 - State로 관리되는 변수 배열에 변화를 줄 때는 불변성을 지켜줘야 하기 때문에 `push`,`splice`,`sort` 등의 함수를 사용하면 안됨
   - 배열을 수정할 때는 기존 배열을 한번 복사하고 복사한 배열을 수정하거나
   - spread 연산자를 사용하거나 `setUsers([...users, user]);`
   - `concat()`함수를 사용할 수 있다. `setUsers(users.concat(user));`
+- 상태관리 함수는 부모 컴포넌트(App)에서 처리하고, 변수와 마찬가지로 함수도 props로 전달하여 자식 컴포넌트에서 함수 실행을 요청할 수 있다.
+
   <details>
     <summary>코드 보기</summary>
     
@@ -218,15 +228,6 @@ https://react.vlpt.us/
     }
     
     // UserList2.js
-    // User 컴포넌트 생성
-    function User({ user }) {
-      return (
-        <div>
-          <b>{user.username}</b> <span>({user.email})</span>
-        </div>
-      );
-    }
-
     export default function UserList2({ users }) {
       return (
         <>
@@ -240,6 +241,14 @@ https://react.vlpt.us/
         </>
       );
     }
+    // User 컴포넌트 생성
+      function User({ user }) {
+        return (
+          <div>
+            <b>{user.username}</b> <span>({user.email})</span>
+          </div>
+        );
+      }
     
     // CreateUser.js
     export default function CreateUser({ username, email, onChange, onCreate }) {
@@ -261,5 +270,52 @@ https://react.vlpt.us/
         </div>
       );
     }
+    ```
+  </details>
+
+### 배열에서 항목 제거하기
+> UserList2.js
+>
+> 삭제함수 props로 전달하고 자식 컴포넌트에서 항목 삭제 요청
+> `filter`함수를 활용해 선택한 요소 삭제
+
+- 삭제버튼 렌더링(매개변수에 key값 참조) `<button onClick={() => onRemove(user.id)}>삭제</button>`
+- 컴포넌트에서 매개변수를 전달할 때는 위와 같이 콜백함수를 이용해야 한다
+  - `onClick={함수()}` 형태는 해당 페이지가 렌더링 됨과 동시에 함수를 실행한다. 이를 막기 위해 `onClick={함수명}` 문법을 사용하는 것인데
+  - `{함수(매개변수)}` 형태는 위 사례와 같이 페이지가 렌더링 됨과 동시에 함수를 실행한다
+  - 하지만 매개변수는 페이지가 렌더링 되었을때가 아니라 유저가 버튼을 클릭해야 참조할 수 있으므로 위와같은 형태는 오류가 발생한다.
+  - 따라서 콜백함수를 이용해 `onClick={()=>{함수(매개변수)}}` 형태로 요청해야 한다.
+- 자식의 자식 컴포넌트에 props를 전달 할때는 자식 컴포넌트에 먼저 전달한 후 자식의 자식 컴포넌트에 다시 전달한다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // UserList2.js
+    // 자식 컴포넌트에 onRemove를 먼저 전달한 후
+    export default function UserList2({ users, onRemove }) {
+      return (
+        ...
+              <User key={user.id} user={user} onRemove={onRemove} />
+        ...
+    // 자식의 자식 컴포넌트에 onRemove 전달한다
+    function User({ user, onRemove }) {
+      return (
+        <div>
+          <b>{user.username}</b> <span>({user.email})</span>
+          <button onClick={() => onRemove(user.id)}>삭제</button>
+        </div>
+      );
+    }
+    ```
+  </details>
+- `filter()`함수를 활용하여 user.id가 매개변수로 전달된 id값과 일치하지 않는 원소만 추출하면 결과적으로 user.id가 매개변수와 같은 배열을 제거하는 셈이 된다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // App.js
+    const onRemove = (id) => {
+      setUsers(users.filter((user) => user.id !== id));
+    };
     ```
   </details>
