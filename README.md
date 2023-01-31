@@ -298,7 +298,7 @@ https://react.vlpt.us/
         ...
               <User key={user.id} user={user} onRemove={onRemove} />
         ...
-    // 자식의 자식 컴포넌트에 onRemove 전달한다
+    // 자식의 자식 컴포넌트에 onRemove를 전달한다
     function User({ user, onRemove }) {
       return (
         <div>
