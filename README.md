@@ -71,7 +71,7 @@ https://react.vlpt.us/
 - 선택한 DOM요소의 ref 객체를 생성한 뒤 `const nameInput = useRef();`
 - ref객체명.current 를 이용해 객체를 조작한다 `nameInput.current.focus();`
   <details>
-    <summary>코드</summary>
+    <summary>코드 보기</summary>
     
     ```javascript
     ...
