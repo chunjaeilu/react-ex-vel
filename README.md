@@ -277,6 +277,7 @@ https://react.vlpt.us/
 > UserList2.js
 >
 > 삭제함수 props로 전달하고 자식 컴포넌트에서 항목 삭제 요청
+> 
 > `filter`함수를 활용해 선택한 요소 삭제
 
 - 삭제버튼 렌더링(매개변수에 key값 참조) `<button onClick={() => onRemove(user.id)}>삭제</button>`
