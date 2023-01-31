@@ -11,7 +11,6 @@ https://react.vlpt.us/
 >
 > 이름과 닉네임을 입력하는 input 요소 상태관리
 
-
 - input 요소가 여러개일 때 단순히 `useState`를 여러번 사용하고 `onChange`도 여러개 만들어서 관리 할 수도 있지만 추천하는 방식은 아님
 - input 요소에 `name`속성을 설정하고 name 값을 참조하는 방법을 추천함
   <details>
@@ -68,7 +67,6 @@ https://react.vlpt.us/
 >
 > useRef로 초기화버튼 클릭시 input에 포커스 설정하기
 
-
 - vaScript에서는 DOM을 선택할 때 `querySelector`나 `getElementById` 등을 사용하지만 리액트에서 DOM을 선택할 때는 `useRef`Hook을 사용한다.
 - Ref객체의 `.current` 로 선택한 DOM을 받는다.
 - 선택하고싶은 DOM에 ref값을 설정하고 `ref={nameInput}`
@@ -117,7 +115,6 @@ https://react.vlpt.us/
 >
 > key값 설정하기
 
-
 - 배열을 렌더링 할 때는 인덱스를 일일이 참조하여 코드를 작성해주는 방법도 있지만, 동적인 배열(배열을 추가하거나 삭제)을 렌더링하는데 한계가 있다
 - 동적인 배열을 렌더링 할 때는 `map()`함수를 활용하면 따로 코드를 수정하지 않아도 배열의 길이만큼 반복해주므로 편리하다
 - 반복되는 요소는 컴포넌트로 따로 관리하는 것이 좋다.
@@ -135,13 +132,134 @@ https://react.vlpt.us/
 - 단, index를 참조할 때는 각 요소의 key값이 고정된 것이 아니라 배열을 추가하고 삭제하는 과정에서 바뀔 수 있으므로 배열의 원소가 고유한 값을 이미 가지고 있다면 가능한한 해당 값을 key값으로 사용하는 것을 권장한다.
 
 ### useRef로 컴포넌트 안의 변수 관리하기
-> UserList2.js
+> UserList2.js, CreateUser.js
 >
 > useRef를 활용해 컴포넌트 안의 변수를 생성, 추가, 제거, 수정할 수 있다.
-
 
 - `useRef`Hook은 DOM을 선택하는 것 외에 컴포넌트 안에서 조회 및 수정할 수 있는 변수를 관리하는 기능이 있다. 
 - useRef로 관리되는 변수는 값이 바뀌어도 컴포넌트가 리렌더링 되지 않는다.
 - 리액트 컴포넌트에서 변수의 상태를 변경하는 함수를 호출하고 나서 리렌더링 이후에 업데이트된 상태를 조회할 수 있으나, useRef로 관리되는 변수는 렌더링 없이 설정 후 바로 조회할 수 있다.
 - Ref로 관리할 변수 생성 : `const nextId = useRef(4);`
-- 
+- State로 관리되는 변수 배열에 변화를 줄 때는 불변성을 지켜줘야 하기 때문에 `push`,`splice`,`sort` 등의 함수를 사용하면 안됨
+  - 배열을 수정할 때는 기존 배열을 한번 복사하고 복사한 배열을 수정하거나
+  - spread 연산자를 사용하거나 `setUsers([...users, user]);`
+  - `concat()`함수를 사용할 수 있다. `setUsers(users.concat(user));`
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // App.js
+    function App() {
+      const [inputs, setInputs] = useState({
+        username: "",
+        email: "",
+      });
+
+      const { username, email } = inputs;
+
+      const onChange = (e) => {
+        const { name, value } = e.target;
+        setInputs({
+          ...inputs,
+          [name]: value,
+        });
+      };
+  
+      const [users, setUsers] = useState([
+        {
+          id: 1,
+          username: "velopert",
+          email: "public.velopert@gmail.com",
+        },
+        {
+          id: 2,
+          username: "tester",
+          email: "tester@example.com",
+        },
+        {
+          id: 3,
+          username: "liz",
+          email: "liz@example.com",
+        },
+      ]);
+
+      // Ref로 관리할 변수 생성
+      const nextId = useRef(4);
+      
+      const onCreate = () => {
+        // 새로운 배열 항목
+        const user = {
+          id: nextId.current,
+          username,
+          email,
+        };
+
+        // users 배열에 새로운 항목 추가
+        setUsers([...users, user]);
+
+        // input 초기화
+        setInputs({ username: "", email: "" });
+
+        // 다음에 생성될 항목 id 변경
+        nextId.current += 1;
+      };
+
+      return (
+        <>
+          <CreateUser
+            username={username}
+            email={email}
+            onChange={onChange}
+            onCreate={onCreate}
+          />
+          <UserList2 users={users} />
+        </>
+      );
+    }
+    
+    // UserList2.js
+    // User 컴포넌트 생성
+    function User({ user }) {
+      return (
+        <div>
+          <b>{user.username}</b> <span>({user.email})</span>
+        </div>
+      );
+    }
+
+    export default function UserList2({ users }) {
+      return (
+        <>
+          <h2>useRef로 컴포넌트 안의 변수 관리하기</h2>
+          <div>
+            {/* User 컴포넌트 불러오기, users 배열 참조하여 props 전달 */}
+            {users.map((user) => (
+              <User key={user.id} user={user} />
+            ))}
+          </div>
+        </>
+      );
+    }
+    
+    // CreateUser.js
+    export default function CreateUser({ username, email, onChange, onCreate }) {
+      return (
+        <div>
+          <input
+            name="username"
+            placeholder="계정명"
+            onChange={onChange}
+            value={username}
+          />
+          <input
+            name="email"
+            placeholder="이메일"
+            onChange={onChange}
+            value={email}
+          />
+          <button onClick={onCreate}>등록</button>
+        </div>
+      );
+    }
+    ```
+  </details>
