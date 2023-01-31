@@ -290,6 +290,7 @@ https://react.vlpt.us/
     <summary>코드 보기</summary>
     
     ```javascript
+    // UserList2.js
     // 자식 컴포넌트에 onRemove를 먼저 전달한 후
     export default function UserList2({ users, onRemove }) {
       return (
@@ -305,5 +306,16 @@ https://react.vlpt.us/
         </div>
       );
     }
+    ```
+  </details>
+- `filter()`함수를 활용하여 user.id가 매개변수로 전달된 id값과 일치하지 않는 원소만 추출하면 결과적으로 user.id가 매개변수와 같은 배열을 제거하는 셈이 된다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // App.js
+    const onRemove = (id) => {
+      setUsers(users.filter((user) => user.id !== id));
+    };
     ```
   </details>
