@@ -494,5 +494,5 @@ https://react.vlpt.us/
   ```
 </details>
 
-<a href="https://www.naver.com" target="_blank">링크이동</a>
+[링크이동](https://www.naver.com){: target="_blank"}
   
