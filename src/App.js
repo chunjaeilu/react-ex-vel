@@ -25,16 +25,19 @@ function App() {
       id: 1,
       username: "velopert",
       email: "public.velopert@gmail.com",
+      active: true,
     },
     {
       id: 2,
       username: "tester",
       email: "tester@example.com",
+      active: false,
     },
     {
       id: 3,
       username: "liz",
       email: "liz@example.com",
+      active: false,
     },
   ]);
 
@@ -65,6 +68,19 @@ function App() {
     setUsers(users.filter((user) => user.id !== id));
   };
 
+  const onToggle = (id) => {
+    setUsers(
+      // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
+      // setUsers 내부에 map함수를 사용하면 결과적으로 바뀐 새로운 배열이 users 변수에 대입된다
+      users.map(
+        (user) => (user.id === id ? { ...user, active: !user.active } : user)
+        // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
+        // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
+        // : user | 일치하지 않는 user는 그대로 출력함
+      )
+    );
+  };
+
   return (
     <>
       <CreateUser
@@ -73,7 +89,7 @@ function App() {
         onChange={onChange}
         onCreate={onCreate}
       />
-      <UserList2 users={users} onRemove={onRemove} />
+      <UserList2 users={users} onRemove={onRemove} onToggle={onToggle} />
     </>
   );
 }
