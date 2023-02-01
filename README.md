@@ -3,6 +3,7 @@
 
 앞선 기초문법은 선행하였으므로 1-09강부터 기록
 
+
 https://react.vlpt.us/
 
 ## 23.01.31(화)
@@ -397,7 +398,7 @@ https://react.vlpt.us/
   ...
   ```
   
-### useEffect Hook 활용
+### useEffect Hook
 > UserList2.js
 >
 > `useEffect` Hook을 활용해 마운트/언마운트/업데이트시 특정 작업을 수행한다
@@ -446,7 +447,7 @@ https://react.vlpt.us/
     <p align='center'><img src ='https://user-images.githubusercontent.com/112890661/215967561-f3173953-3643-455b-9ba3-5fec980b35fc.png' width='350'></p>
   </details>
 
-### useMemo Hook 활용
+### useMemo Hook
 > App.js >> countActiveUsers 컴포넌트
 >
 > `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
@@ -485,7 +486,13 @@ https://react.vlpt.us/
   ```
   <p align='center'><image src='https://user-images.githubusercontent.com/112890661/215980510-74d51af4-9a17-4422-b42c-bd1d080dd84b.png' width='350'></p>
 - `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
-  
+
+### useCallback Hook
+> App.js >> countActiveUsers 컴포넌트
+>
+> `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
+
+- 
 ---
 <details>
   <summary>코드 보기</summary>
@@ -494,5 +501,4 @@ https://react.vlpt.us/
   ```
 </details>
 
-[링크이동](https://www.naver.com){: target="_blank"}
   
