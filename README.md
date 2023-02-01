@@ -1,7 +1,8 @@
 # 리액트 실습 노트
 패스트캠퍼스에서 제공하는 리액트 온라인 강의 교재를 따라가면서 실습한 내용을 날짜별로 기록한다
 
-앞선 기초문법은 선행하였으므로 09강부터 기록
+앞선 기초문법은 선행하였으므로 1-09강부터 기록
+
 
 https://react.vlpt.us/
 
@@ -329,4 +330,175 @@ https://react.vlpt.us/
 ### 배열 항목 수정하기
 > UserList2.js
 >
-> 
+> `map()`함수를 이용해 배열의 불변성을 유지하면서 배열을 업데이트(수정)할 수 있다
+>
+> `...user` 스프레드 연산자를 이용해 배열 원소의 속성을 선택할 수 있다
+
+- users 배열에 `active` 속성을 부여한다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // App.js
+    const [users, setUsers] = useState([
+      {
+        id: 1,
+        username: "velopert",
+        email: "public.velopert@gmail.com",
+        active: true,
+      },
+      {
+        id: 2,
+        username: "tester",
+        email: "tester@example.com",
+        active: false,
+      },
+      {
+        id: 3,
+        username: "liz",
+        email: "liz@example.com",
+        active: false,
+      },
+    ]);
+    ```
+  </details>
+- 하위 컴포넌트에서 삼항연산자를 이용해 active 속성에 따라 스타일이 바뀌도록 지정한다
+- on이벤트로 `onToggle` 함수 실행을 요청한다
+  ```javascript
+  // UserList2.js >> User 컴포넌트
+  ...
+  <b 
+    style={{
+      cursor: "pointer",
+      color: user.active ? "green" : "black"
+      // user.active가 true이면 color를 'green', false이면 'black' 으로 설정
+    }}
+    onMouseOver={() => onToggle(user.id)}
+    // 사용자가 선택한(마우스를 올린) `user.id`를 매개변수로 전달
+  >
+  ...
+  ```
+- 전달받은 `user.id` 매개변수를 참조해 `onToggle()`함수 실행
+- 스프레드연산자 `{...user, 속성명: 속성값}` 는 user 객체의 속성을 펼친 뒤 특정 속성을 선택한다
+  ```javascript
+  // App.js
+  ...
+  const onToggle = (id) => {
+    setUsers(
+      // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
+      // setUsers 내부에 map함수를 사용하면 map함수로 바뀐 새로운 배열이 users에 대입된다
+      users.map((user) =>
+        user.id === id ? { ...user, active: !user.active } : user
+        // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
+        // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
+        // : user | 일치하지 않는 user는 그대로 출력함
+      )
+    );
+  };
+  ...
+  ```
+  
+### useEffect Hook
+> UserList2.js
+>
+> `useEffect` Hook을 활용해 마운트/언마운트/업데이트시 특정 작업을 수행한다
+
+- `useEffect`를 사용할 때는 첫번째 파라미터에는 함수, 두번째 파라미터에는 의존값이 들어있는 배열(`deps`)을 넣는다. `useEffect(()=>{실행코드},[의존값]);`
+  - `deps`는 배열 안의 의존값의 변화를 인식하면 함수를 실행한다는 의미이다.
+  - `deps`에 빈 배열 `[]`을 넣으면 컴포넌트가 처음 렌더링 될 때(마운트) 한 번만 실행한다.
+  - `deps`를 비워두면 `useEffect(()=>{실행코드});` 모든 변수의 변화에 반응하므로 권장하지 않는다.
+- useEffect는 `cleanup` 함수를 반환할 수 있는데, `deps`에 빈 배열 `[]`을 넣으면 컴포넌트가 사라질 때(언마운트) 실행된다.
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // UserList2.js >> User 컴포넌트
+    useEffect(() => {
+      console.log("컴포넌트가 화면에 나타남");
+      return () => {
+        console.log("컴포넌트가 화면에서 사라짐");
+        // 컴포넌트가 사라질 때(유저 목록을 삭제할 때) 반환되는 함수 (cleanup 함수)
+      }
+    },[]);
+    ```
+    <p align='center'><img src ='https://user-images.githubusercontent.com/112890661/215961434-e71604c5-a1fc-4ec1-ab92-c6368e484607.png' width='350'>&nbsp;&nbsp;&nbsp;<img src='https://user-images.githubusercontent.com/112890661/215961361-4fd60c5d-2f5f-49f2-9dc7-e6e4e2068c39.png' width="350"></p>
+  </details>
+  - `cleanup` 함수는 렌더링 될 때 이전에 남은 함수를 실행시켜 메모리 누수를 막을 수 있다
+  - `cleanup` 함수는 setState나 setTimeout, API 요청과 같은 비동기함수가 작동할 때 조건문을 걸어 언마운트 되었을 때만 실행할 수 있도록 한다
+  - 메모리 누수를 막기 위해 useRef로 상태를 관리할 수도 있다.
+- `deps`에 특정 값을 넣으면
+  - 처음 마운트 될 때도 호출되고 지정한 값이 바뀔 때도 호출된다
+  - `cleanup`함수는 언마운트시에도 호출되고 값이 바뀌기 직전에도 호출된다
+- `useEffect()` 안에서 사용하는 상태나 props가 있다면, `deps`에 해당 값을 반드시 넣어줘야 한다
+  - 만약 해당 상태나 props를 `deps`에 넣어주지 않으면 `useEffect`에 등록한 함수가 실행될 때 최신 상태/props를 반영하지 않게 된다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // UserList2.js >> User 컴포넌트
+    useEffect(() => {
+      console.log("user값이 설정됨", user.id);
+      return () => {
+        console.log("user가 바뀌기 전", user.id);
+      }
+    }, [user]);
+    ```
+    - 최초 마운트 될 때와 user 상태를 변화시킬 때 useEffect 안의 함수가 작동되고, user를 삭제(언마운트)하거나 상태를 변경하기 직전에 '...바뀌기 전' 함수가 실행되는 것을 알 수 있다.
+    <p align='center'><img src ='https://user-images.githubusercontent.com/112890661/215967561-f3173953-3643-455b-9ba3-5fec980b35fc.png' width='350'></p>
+  </details>
+
+### useMemo Hook
+> App.js >> countActiveUsers 컴포넌트
+>
+> `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
+
+- `user.active`가 활성화 된 개수를 구하는 컴포넌트 함수 `countActiveUsers()`를 생성하고
+- `countActiveUsers`에서 리턴한 값을 `count`변수에 넣어준다
+  <details>
+    <summary>코드 보기</summary>
+    
+    ```javascript
+    // App.js
+    function countActiveUsers(users) {
+      console.log("활성 사용자 수를 세는 중...");
+      return users.filter((user) => user.active).length;
+      // users 배열에서 active가 true인 새로운 배열을 추출하고, 배열의 길이를 리턴
+    }
+    ...
+    const count = useMemo(() => countActiveUsers(users), [users]);
+    return (
+      ...
+       <div>활성 사용자 수 : {count}</div>
+      ...
+    );
+    ```
+    <p align='center'><image src = 'https://user-images.githubusercontent.com/112890661/215978658-fe241649-4d01-4b8a-ae95-f2ee60fccabf.png' width='350'></p>
+  </details>
+- 활성 사용자 수는 제대로 렌더링 되지만 함수 호출을 감지하기 위해 작성한 `console.log('활성 사용자...')`는 유저정보만 입력해도 계속 호출되는 것을 알 수 있다.
+  - `input`값이 바뀔 때도 컴포넌트가 리렌더링 된다는 의미인데, 이렇게 리렌더링이 불필요할때도 함수를 호출해서 자원이 낭비된다.
+- 이런 현상을 해결하기 위해 사용하는 것이 `useMemo` Hook
+  - 기본형 : `useMemo(()=>{실행코드;},[deps])`
+  - 첫번째 인자에는 연산을 정의하는 함수, 두번째 인자에는 `deps` 배열을 넣어준다.
+  - `deps`의 내용이 바뀌면 함수를 실행하고, 내용이 바뀌지 않으면 이전에 연산한 값을 재사용 한다.
+  ```javascript
+  const count = useMemo(() => countActiveUsers(users), [users]);
+  // users의 내용이 바뀔 때만 countActiveUsers() 함수를 실행
+  ```
+  <p align='center'><image src='https://user-images.githubusercontent.com/112890661/215980510-74d51af4-9a17-4422-b42c-bd1d080dd84b.png' width='350'></p>
+- `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
+
+### useCallback Hook
+> App.js >> countActiveUsers 컴포넌트
+>
+> `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
+
+- 
+---
+<details>
+  <summary>코드 보기</summary>
+    
+  ```javascript
+  ```
+</details>
+
+  
