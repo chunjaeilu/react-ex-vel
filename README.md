@@ -488,17 +488,64 @@ https://react.vlpt.us/
 - `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
 
 ### useCallback Hook
-> App.js >> countActiveUsers 컴포넌트
+> App.js
 >
-> `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
+> `useCallback` Hook을 활용해 함수를 재사용 할 수 있다
 
-- 
----
-<details>
-  <summary>코드 보기</summary>
+- `useCallback`은 `useMemo` Hook에서 파생된 Hook으로, 사용 목적과 방법 또한 유사하다.
+- 컴포넌트에 선언한 함수는 컴포넌트가 리렌더링 될 때 마다 새로 만들어지므로 불필요한 호출을 반복한다.
+- 함수 생성 자체가 큰 부하를 가져오진 않지만 최적화를 위해 함수를 필요할때만 만들고 재사용 하는 것은 중요하다.
+- 기본형 : `const 함수명 = useCallback(()=>{실행코드},[deps])`
+- `useEffect`와 마찬가지로 `useCallback` 내부에서 사용하는 상태나 props는 반드시 `deps`에 넣어줘야 한다.
+- 이전에 생성했던 `onCreate()`, `onRemove()`, `onToggle()` 함수를 `useCallback`을 사용해 재사용 할 수 있도록 해보자
+	<details>
+  	<summary>코드 보기</summary>
     
   ```javascript
-  ```
-</details>
+	// App.js
+	const onCreate = useCallback(() => {
+    // 새로운 배열 항목
+    const user = {
+      id: nextId.current,
+      username,
+      email,
+    };
 
-  
+    // users 배열에 새로운 항목 추가
+    setUsers([...users, user]);
+
+    // input 초기화
+    setInputs({ username: "", email: "" });
+
+    // 다음에 생성될 항목 id 변경
+    nextId.current += 1;
+  }, [users, username, email]);
+
+  const onRemove = useCallback(id => {
+    // filter함수를 이용, user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
+    // 결과적으로 user.id 가 id 인 것을 제거함
+    setUsers(users.filter((user) => user.id !== id));
+  }, [users]);
+
+  const onToggle = useCallback(id => {
+		setUsers(
+      // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
+      // setUsers 내부에 map함수를 사용하면 결과적으로 바뀐 새로운 배열이 users 변수에 대입된다
+      users.map(
+        (user) => (user.id === id ? { ...user, active: !user.active } : user)
+        // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
+        // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
+        // : user | 일치하지 않는 user는 그대로 출력함
+      )
+    );
+  }, [users]);
+  ```
+	</details>
+- 
+---
+	<details>
+  	<summary>코드 보기</summary>
+    
+  	```javascript
+  	```
+	</details>
