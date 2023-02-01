@@ -408,6 +408,9 @@ https://react.vlpt.us/
   - `deps`에 빈 배열 `[]`을 넣으면 컴포넌트가 처음 렌더링 될 때(마운트) 한 번만 실행한다.
   - `deps`를 비워두면 `useEffect(()=>{실행코드});` 모든 변수의 변화에 반응하므로 권장하지 않는다.
 - useEffect는 `cleanup` 함수를 반환할 수 있는데, `deps`에 빈 배열 `[]`을 넣으면 컴포넌트가 사라질 때(언마운트) 실행된다.
+  - `cleanup` 함수는 렌더링 될 때 이전에 남은 함수를 실행시켜 메모리 누수를 막을 수 있다
+  - `cleanup` 함수는 setState나 setTimeout, API 요청과 같은 비동기함수가 작동할 때 조건문을 걸어 언마운트 되었을 때만 실행할 수 있도록 한다
+  - 메모리 누수를 막기 위해 useRef로 상태를 관리할 수도 있다.
   <details>
     <summary>코드 보기</summary>
     
@@ -423,9 +426,6 @@ https://react.vlpt.us/
     ```
     <p align='center'><img src ='https://user-images.githubusercontent.com/112890661/215961434-e71604c5-a1fc-4ec1-ab92-c6368e484607.png' width='350'>&nbsp;&nbsp;&nbsp;<img src='https://user-images.githubusercontent.com/112890661/215961361-4fd60c5d-2f5f-49f2-9dc7-e6e4e2068c39.png' width="350"></p>
   </details>
-  - `cleanup` 함수는 렌더링 될 때 이전에 남은 함수를 실행시켜 메모리 누수를 막을 수 있다
-  - `cleanup` 함수는 setState나 setTimeout, API 요청과 같은 비동기함수가 작동할 때 조건문을 걸어 언마운트 되었을 때만 실행할 수 있도록 한다
-  - 메모리 누수를 막기 위해 useRef로 상태를 관리할 수도 있다.
 - `deps`에 특정 값을 넣으면
   - 처음 마운트 될 때도 호출되고 지정한 값이 바뀔 때도 호출된다
   - `cleanup`함수는 언마운트시에도 호출되고 값이 바뀌기 직전에도 호출된다
@@ -488,17 +488,117 @@ https://react.vlpt.us/
 - `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
 
 ### useCallback Hook
-> App.js >> countActiveUsers 컴포넌트
+> App.js
 >
-> `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
+> `useCallback` Hook을 활용해 함수를 재사용 할 수 있다
 
-- 
----
-<details>
-  <summary>코드 보기</summary>
+- `useCallback`은 `useMemo` Hook에서 파생된 Hook으로, 사용 목적과 방법 또한 유사하다.
+- 컴포넌트에 선언한 함수는 컴포넌트가 리렌더링 될 때 마다 새로 만들어지므로 불필요한 호출을 반복한다.
+- 함수 생성 자체가 큰 부하를 가져오진 않지만 최적화를 위해 함수를 필요할때만 만들고 재사용 하는 것은 중요하다.
+- 기본형 : `const 함수명 = useCallback(()=>{실행코드},[deps])`
+- `useEffect`와 마찬가지로 `useCallback` 내부에서 사용하는 상태나 props는 반드시 `deps`에 넣어줘야 한다.
+- 이전에 생성했던 `onCreate()`, `onRemove()`, `onToggle()` 함수를 `useCallback`을 사용해 재사용 할 수 있도록 해보자
+  <details>
+    <summary>코드 보기</summary>
     
-  ```javascript
-  ```
-</details>
+    ```javascript
+    const onCreate = useCallback(() => {
+      // 새로운 배열 항목
+      const user = {
+        id: nextId.current,
+        username,
+        email,
+      };
 
+      // users 배열에 새로운 항목 추가
+      setUsers([...users, user]);
+
+      // input 초기화
+      setInputs({ username: "", email: "" });
+
+      // 다음에 생성될 항목 id 변경
+      nextId.current += 1;
+    },[users, username, email]);
+    
+    const onRemove = useCallback(id => {
+      // filter함수를 이용, user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
+      // 결과적으로 user.id 가 id 인 것을 제거함
+      setUsers(users.filter((user) => user.id !== id));
+    }, [users]);
+    
+    const onToggle = useCallback(id => {
+      setUsers(
+        // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
+        // setUsers 내부에 map함수를 사용하면 결과적으로 바뀐 새로운 배열이 users 변수에 대입된다
+        users.map(
+          (user) => (user.id === id ? { ...user, active: !user.active } : user)
+          // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
+          // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
+          // : user | 일치하지 않는 user는 그대로 출력함
+        )
+      );
+    }, [users]);
+    ```
+  </details>
+
+### React.memo 함수
+> App.js, CreateUser.js, UserList2.js
+>
+> `React.memo` 함수를 사용한 컴포넌트 리렌더링 방지
   
+- `React.memo` 함수는 컴포넌트의 props가 바뀌지 않으면 리렌더링을 방지하여 컴포넌트의 리렌더링 성능 최적화를 해줄 수 있다
+- 이 함수를 사용하면 컴포넌트에서 리렌더링이 필요한 상황에서만 리렌더링을 하도록 설정할 수 있다.
+- props를 받는 컴포넌트를 `React.memo()`로 감싸주면 된다.
+  <details>
+  	<summary>코드 보기</summary>
+    
+  	```javascript
+    // CreateUser.js
+    import React from "react";
+
+    const CreateUser = ({ username, email, onChange, onCreate }) => {
+      return (
+        ...
+      );
+    };
+    
+    // 컴포넌트 함수를 만들고 따로 export 하는 경우(rfce) 컴포넌트 이름을 React.memo()로 감싼다
+    export default React.memo(CreateUser);
+  	```
+    
+    ```javascript
+    // UserList2.js
+    import React from "react";
+    
+    // 컴포넌트 함수를 선언함과 동시에 export 하는 경우(rfc) React.memo()로 함수 전체를 감싼다
+    export default React.memo(({ users, onRemove, onToggle }) => {
+      return (
+        ...
+      );
+    });
+    
+    // 컴포넌트 내부에 생성한 컴포넌트로, 따로 export 하지 않는 경우에도 React.memo()로 함수 전체를 감싼다
+    const User = React.memo(({ user, onRemove, onToggle }) => {
+      ...
+      return (
+        ...
+      );
+    });
+  	```
+	</details>
+---
+	<details>
+  	<summary>코드 보기</summary>
+    
+  	```javascript
+  	```
+	</details>
+- 여기까지 수행하면 input을 입력하는 동안 UserList는 리렌더링 되지 않는다.
+- 그런데, UserList 중 하나라도 수정하면 users 배열에 변화가 생기기 때문에 users를 `deps`로 가지는 모든 함수가 리렌더링 된다.
+- 이를 최적화 하기 위해서는 함수에서 `useState`로 관리하는 users를 참조하지 않으면 된다.
+   - 함수에 전달받는 `deps` 배열에서 users를 삭제한다
+   - useState에 users를 참조하지 않고 함수형 업데이트 방식을 사용한다. `setUsers(users => 바뀐 users)`
+   - 함수형 업데이트를 사용하면 `setUsers`에 등록하는 콜백함수의 파라미터에서 최신 `users`를 참조할 수 있기 때문에 `deps`에 users를 넣지 않아도 된다.
+- 여기까지 작업을 완료하면 특정 항목을 수정할 때 해당 항목만 리렌더링 된다. 최적화 완료
+- 단, `useCallback`, `useMemo`, `React.memo`를 이용한 렌더링 최적화는 컴포넌트의 성능을 실제로 개선할 수 있는 상황에서만 사용하는 것이 좋다
+- 예를 들어 렌더링 최적화를 하지 않을 컴포넌트에 React.memo를 사용하는 것은 불필요한 props 비교만 하는 것이기 때문에 오히려 불필요한 작업이 늘어나기도 하며, 의도치 않은 버그들이 발생할 수 있기 
