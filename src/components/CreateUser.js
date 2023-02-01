@@ -1,4 +1,6 @@
-export default function CreateUser({ username, email, onChange, onCreate }) {
+import React from "react";
+
+const CreateUser = ({ username, email, onChange, onCreate }) => {
   return (
     <div>
       <input
@@ -16,4 +18,7 @@ export default function CreateUser({ username, email, onChange, onCreate }) {
       <button onClick={onCreate}>등록</button>
     </div>
   );
-}
+};
+
+// 컴포넌트 함수를 만들고 따로 export 하는 경우(rfce) 컴포넌트 이름을 React.memo()로 감싸는 방식
+export default React.memo(CreateUser);

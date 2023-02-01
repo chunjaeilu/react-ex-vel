@@ -1,14 +1,14 @@
 import "./App.css";
-import { useState, useRef, useMemo, useCallback } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 
 import UserList2 from "./components/UserList2";
 import CreateUser from "./components/CreateUser";
 
-function countActiveUsers(users) {
+const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
   return users.filter((user) => user.active).length;
   // users 배열에서 active가 true인 새로운 배열을 추출하고, 배열의 길이를 리턴
-}
+};
 
 function App() {
   const [inputs, setInputs] = useState({
@@ -18,13 +18,13 @@ function App() {
 
   const { username, email } = inputs;
 
-  const onChange = (e) => {
+  const onChange = useCallback((e) => {
     const { name, value } = e.target;
-    setInputs({
+    setInputs((inputs) => ({
       ...inputs,
       [name]: value,
-    });
-  };
+    }));
+  }, []);
 
   const [users, setUsers] = useState([
     {
@@ -59,39 +59,40 @@ function App() {
     };
 
     // users 배열에 새로운 항목 추가
-    setUsers([...users, user]);
+    // setUsers([...users, user]);
+    setUsers((users) => users.concat(user));
 
     // input 초기화
     setInputs({ username: "", email: "" });
 
     // 다음에 생성될 항목 id 변경
     nextId.current += 1;
-  }, [users, username, email]);
+  }, [username, email]);
 
-  const onRemove = useCallback(
-    (id) => {
-      // filter함수를 이용, user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
-      // 결과적으로 user.id 가 id 인 것을 제거함
-      setUsers(users.filter((user) => user.id !== id));
-    },
-    [users]
-  );
+  const onRemove = useCallback((id) => {
+    // filter함수를 이용, user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
+    // 결과적으로 user.id 가 id 인 것을 제거함
+    // setUsers(users.filter((user) => user.id !== id));
+    setUsers((users) => users.filter((user) => user.id !== id));
+  }, []);
 
-  const onToggle = useCallback(
-    (id) => {
-      setUsers(
-        // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
-        // setUsers 내부에 map함수를 사용하면 결과적으로 바뀐 새로운 배열이 users 변수에 대입된다
-        users.map(
-          (user) => (user.id === id ? { ...user, active: !user.active } : user)
-          // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
-          // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
-          // : user | 일치하지 않는 user는 그대로 출력함
-        )
-      );
-    },
-    [users]
-  );
+  const onToggle = useCallback((id) => {
+    // setUsers(
+    // map함수는 특정인자를 바꾸고 새로운 배열을 출력한다
+    // setUsers 내부에 map함수를 사용하면 결과적으로 바뀐 새로운 배열이 users 변수에 대입된다
+    // users.map(
+    // (user) => (user.id === id ? { ...user, active: !user.active } : user)
+    // user.id === id ? | users 배열 중 id가 매개변수로 전달받은 id와 일치하면
+    // { ...user, active: !user.active } | 해당 user의 active 속성을 현재와 반대로 전환(true >> false, false >> true)시키고
+    // : user | 일치하지 않는 user는 그대로 출력함
+    // )
+    // );
+    setUsers((users) =>
+      users.map((user) =>
+        user.id === id ? { ...user, active: !user.active } : user
+      )
+    );
+  }, []);
 
   // const count = countActiveUsers(users);
   // useMemo(()=>{실행코드;},[deps])
