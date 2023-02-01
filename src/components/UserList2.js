@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 export default function UserList2({ users, onRemove, onToggle }) {
   return (
@@ -22,13 +22,13 @@ export default function UserList2({ users, onRemove, onToggle }) {
 // User 컴포넌트 생성
 // 자식의 자식 컴포넌트에 onRemove 전달
 function User({ user, onRemove, onToggle }) {
-  useEffect(() => {
-    console.log("user값이 설정됨", user.id);
+  // useEffect(() => {
+  //   console.log("user값이 설정됨", user.id);
 
-    return () => {
-      console.log("user가 바뀌기 전", user.id);
-    };
-  }, [user]);
+  //   return () => {
+  //     console.log("user가 바뀌기 전", user.id);
+  //   };
+  // }, [user]);
   return (
     <div>
       <b
@@ -37,7 +37,7 @@ function User({ user, onRemove, onToggle }) {
           color: user.active ? "green" : "black",
           // user.active가 true이면 color를 'green', false이면 'black' 으로 설정
         }}
-        onMouseOver={() => onToggle(user.id)}
+        onClick={() => onToggle(user.id)}
         // 사용자가 선택한(마우스를 올린) 유저정보 id를 매개변수로 전달
       >
         {user.username}
