@@ -593,33 +593,29 @@ https://react.vlpt.us/
    - useState에 users를 참조하지 않고 함수형 업데이트 방식을 사용한다. `setUsers(users => 바뀐 users)`
    - 함수형 업데이트를 사용하면 `setUsers`에 등록하는 콜백함수의 파라미터에서 최신 `users`를 참조할 수 있기 때문에 `deps`에 users를 넣지 않아도 된다.
 	<details>
-  	<summary>코드 보기</summary>
+		<summary>코드 보기</summary>
     
-  	```javascript
+		```javascript
 		// App.js
 		// setUsers()에서 함수형 업데이트 방식으로 관리하고, deps에서 users를 삭제
 		const onCreate = useCallback(() => {
-    	...
-    	// setUsers([...users, user]);
-    	setUsers((users) => users.concat(user));
-    	...
-  	}, [username, email]);
-		
+			...
+			// setUsers([...users, user]);
+			setUsers((users) => users.concat(user));
+			...
+		}, [username, email]);
+
 		const onRemove = useCallback((id) => {
-    	...
-    	// setUsers(users.filter((user) => user.id !== id));
-    	setUsers((users) => users.filter((user) => user.id !== id));
-  	}, []);
-		
+			...
+			// setUsers(users.filter((user) => user.id !== id));
+			setUsers((users) => users.filter((user) => user.id !== id));
+		}, []);
+
 		const onToggle = useCallback((id) => {
-    	// setUsers(users.map((user) => (user.id === id ? { ...user, active: !user.active } : user)));
-    	setUsers((users) =>
-      	users.map((user) =>
-        	user.id === id ? { ...user, active: !user.active } : user
-      	)
-    	);
-  	}, []);
-  	```
+			// setUsers(users.map((user) => (user.id === id ? { ...user, active: !user.active } : user)));
+			setUsers((users) => users.map((user) => user.id === id ? { ...user, active: !user.active } : user));
+		}, []);
+		```
 	</details>
 - 여기까지 작업을 완료하면 특정 항목을 수정할 때 해당 항목만 리렌더링 된다. 최적화 완료
 - 단, `useCallback`, `useMemo`, `React.memo`를 이용한 렌더링 최적화는 컴포넌트의 성능을 실제로 개선할 수 있는 상황에서만 사용하는 것이 좋다
