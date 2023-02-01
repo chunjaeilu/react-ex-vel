@@ -226,7 +226,9 @@ https://react.vlpt.us/
         </>
       );
     }
-    
+    ```  
+  
+    ```javascript
     // UserList2.js
     export default function UserList2({ users }) {
       return (
@@ -242,14 +244,16 @@ https://react.vlpt.us/
       );
     }
     // User 컴포넌트 생성
-      function User({ user }) {
-        return (
-          <div>
-            <b>{user.username}</b> <span>({user.email})</span>
-          </div>
-        );
-      }
-    
+    function User({ user }) {
+      return (
+        <div>
+          <b>{user.username}</b> <span>({user.email})</span>
+        </div>
+      );
+    }
+    ```  
+  
+    ```javascript    
     // CreateUser.js
     export default function CreateUser({ username, email, onChange, onCreate }) {
       return (
@@ -277,6 +281,7 @@ https://react.vlpt.us/
 > UserList2.js
 >
 > 삭제함수 props로 전달하고 자식 컴포넌트에서 항목 삭제 요청
+> 
 > `filter`함수를 활용해 선택한 요소 삭제
 
 - 삭제버튼 렌더링(매개변수에 key값 참조) `<button onClick={() => onRemove(user.id)}>삭제</button>`
@@ -297,7 +302,7 @@ https://react.vlpt.us/
         ...
               <User key={user.id} user={user} onRemove={onRemove} />
         ...
-    // 자식의 자식 컴포넌트에 onRemove 전달한다
+    // 자식의 자식 컴포넌트에 onRemove를 전달한다
     function User({ user, onRemove }) {
       return (
         <div>
@@ -319,3 +324,9 @@ https://react.vlpt.us/
     };
     ```
   </details>
+
+## 23.02.01(수)
+### 배열 항목 수정하기
+> UserList2.js
+>
+> 
