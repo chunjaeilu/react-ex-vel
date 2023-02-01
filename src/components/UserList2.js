@@ -28,7 +28,7 @@ const User = React.memo(({ user, onRemove, onToggle }) => {
   //   console.log("user값이 설정됨", user.id);
 
   //   return () => {
-  //     console.log("user가 바뀌기 전", user.id);
+  //     console.log("user 바뀌기 전", user.id);
   //   };
   // }, [user]);
   return (
