@@ -226,7 +226,9 @@ https://react.vlpt.us/
         </>
       );
     }
-    
+    ```  
+  
+    ```javascript
     // UserList2.js
     export default function UserList2({ users }) {
       return (
@@ -242,14 +244,16 @@ https://react.vlpt.us/
       );
     }
     // User 컴포넌트 생성
-      function User({ user }) {
-        return (
-          <div>
-            <b>{user.username}</b> <span>({user.email})</span>
-          </div>
-        );
-      }
-    
+    function User({ user }) {
+      return (
+        <div>
+          <b>{user.username}</b> <span>({user.email})</span>
+        </div>
+      );
+    }
+    ```  
+  
+    ```javascript    
     // CreateUser.js
     export default function CreateUser({ username, email, onChange, onCreate }) {
       return (
