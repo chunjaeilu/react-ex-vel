@@ -882,18 +882,135 @@ https://react.vlpt.us/
 
 
 ### 커스텀 Hooks 만들기
-> Inputs.js
+> useInputs.js, App.js
 >
 > 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 있다.
 
 - 커스텀 Hooks는 src 디렉토리에 hooks 라는 디렉토리를 만들고, 그 안에 useSomething.js 파일로 관리한다.
 
-
-## 자주 쓰는 태그
+#### input을 관리하는 커스텀 Hook을 만들어보자
+- root/src/hooks/ 디렉토리에 useInputs.js 파일을 생성한다
+- useInput.js에 `input` 관련 로직을 작성해준다.
   <details>
     <summary>코드 보기</summary>
 
     ```javascript
+    // useInputs.js
+    import { useState, useCallback } from "react";
 
+    export default function useInputs(initialForm) {
+      // 여기서 initialForm은 App.js에서 설정한 초기값 {username:"", email:""}을 의미
+      const [form, setForm] = useState(initialForm);
+
+      // change
+      const onChange = useCallback((e) => {
+        const { name, value } = e.target;
+        setForm((form) => ({ ...form, [name]: value }));
+        // input에 값을 입력하면 form 변수에 {username:"이름", email:"메일주소"} 형태로 저장된다.
+      }, []);
+
+      const reset = useCallback(() => {
+        // form 초기화
+        setForm(initialForm);
+      }, [initialForm]);
+
+      return [form, onChange, reset];
+      // form객체, onChange()함수, reset()함수를 반환
+    }
     ```
   </details>
+- `useInputs` Hook을 App.js에 반영해보자
+  - `useReducer`로 관리하는 input 관련 로직을 삭제하고 삭제한 로직을 대신할 useInputs를 설정한다.
+  - 새로운 input이 전송되었을 때(`onCreate`) input 값을 초기화하는 함수 `reset()`을 `onCreate()` 함수 내부에 작성해준다
+  <details>
+    <summary>코드 보기</summary>
+
+    ```javascript
+    // App.js
+    // 커스텀훅 import
+    import useInputs from "./hooks/useInputs";
+    ...
+    function App() {
+      ...
+      // 삭제된 inputs 관련 작업을 대신할 useInputs 생성
+      // useInputs에서 반환한 form, onChange, reset을 받아 상태를 업데이트 한다
+      const [{ username, email }, onChange, reset] = useInputs({
+        username: "",
+        email: "",
+      });
+      // 초기값 {username: "", email: ""} 가 useInputs에 initialForm 객체로 전달된다
+      ...
+      
+      // onCreate 함수
+      const onCreate = useCallback(() => {
+        ...
+        reset(); // 새로운 항목을 추가할때 input 값 초기화 (커스텀 Hook useInputs에서 받아옴)
+        nextId.current += 1;
+      }, [username, email, reset]);
+      // 함수 내부에서 reset 함수를 호출하므로 deps 배열에 reset을 추가해야 한다
+      ...
+    }
+    ```
+  </details>
+
+#### useInputs 커스텀 Hook을 useReducer를 사용해 구현하기
+<details>
+  <summary>펼쳐보기</summary>
+
+  - useState로 관리하는 변수를 useReducer로 관리 선언
+    ```javascript
+    const [form, dispatch] = useReducer(reducer, initialForm);
+    ```
+  - 함수 내부에 `setForm()` 함수를 `dispatch()` 함수로 변경
+    ```javascript
+    const onChange = useCallback((e) => {
+      const { name, value } = e.target;
+      dispatch({type: "CHANGE_INPUT", name, value});
+    }, []);
+
+    const reset = useCallback(() => {
+      // form 초기화
+      dispatch({ type: "RESET" });
+    }, []); // 더이상 initialForm을 참조하지 않으므로 deps에서 제거해준다
+    ```
+  - 컴포넌트 외부에 `reducer()` 함수 작성
+    ```javascript
+    function reducer(state, action) {
+      switch (action.type) {
+        // onChange
+        case "CHANGE_INPUT":
+          return {
+            ...state,
+            [action.name]: action.value,
+          };
+        // reset
+        case "RESET":
+          return Object.keys(state).reduce((acc, current) => {
+            // Object.keys(state) : state 객체를 배열로 전환
+            // reduce((acc, current)=>{}) : 배열의 각 인자(current)에 로직을 만들어 acc를 반환하는 함수
+            // 이해가 잘 되지 않는다...
+            acc[current] = "";
+            return acc;
+          }, {});
+        default:
+          return state;
+      }
+    }
+    ```
+</details>
+
+## 재사용
+
+## 23.02.02(목)
+### 커스텀 Hooks 만들기
+> Inputs.js
+>
+> 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 
+
+<details>
+  <summary>코드 보기</summary>
+
+  ```javascript
+
+  ```
+</details>
