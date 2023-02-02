@@ -7,7 +7,7 @@
 https://react.vlpt.us/
 
 ## 23.01.31(화)
-### 여러개의 input 상태관리
+### 1-09. 여러개의 input 상태관리
 > Inputs.js
 >
 > 이름과 닉네임을 입력하는 input 요소 상태관리
@@ -63,7 +63,7 @@ https://react.vlpt.us/
     ```
   </details>
   
-### useRef로 DOM 선택하기
+### 1-10. useRef로 DOM 선택하기
 > Inputs.js
 >
 > useRef로 초기화버튼 클릭시 input에 포커스 설정하기
@@ -109,7 +109,7 @@ https://react.vlpt.us/
     ```
   </details>
   
-### 배열 렌더링하기
+### 1-11. 배열 렌더링하기
 > UserList.js
 >
 > `map()`함수로 배열 렌더링 하기
@@ -132,7 +132,7 @@ https://react.vlpt.us/
     ))}`
 - 단, index를 참조할 때는 각 요소의 key값이 고정된 것이 아니라 배열을 추가하고 삭제하는 과정에서 바뀔 수 있으므로 배열의 원소가 고유한 값을 이미 가지고 있다면 가능한한 해당 값을 key값으로 사용하는 것을 권장한다.
 
-### useRef로 컴포넌트 안의 변수 관리하기
+### 1-12. useRef로 컴포넌트 안의 변수 관리하기
 > UserList2.js, CreateUser.js
 >
 > useRef를 활용해 컴포넌트 안의 변수를 생성
@@ -142,7 +142,7 @@ https://react.vlpt.us/
 - 리액트 컴포넌트에서 변수의 상태를 변경하는 함수를 호출하고 나서 리렌더링 이후에 업데이트된 상태를 조회할 수 있으나, useRef로 관리되는 변수는 렌더링 없이 설정 후 바로 조회할 수 있다.
 - Ref로 관리할 변수 생성 : `const nextId = useRef(4);`
 
-### 배열에 항목 추가하기
+### 1-13. 배열에 항목 추가하기
 > UserList2.js, CreateUser.js
 >
 > 스프레드 연산자로 배열에 새로운 항목 추가 (Create)
@@ -278,7 +278,7 @@ https://react.vlpt.us/
     ```
   </details>
 
-### 배열에서 항목 제거하기
+### 1-14. 배열에서 항목 제거하기
 > UserList2.js
 >
 > 삭제함수 props로 전달하고 자식 컴포넌트에서 항목 삭제 요청
@@ -327,7 +327,7 @@ https://react.vlpt.us/
   </details>
 
 ## 23.02.01(수)
-### 배열 항목 수정하기
+### 1-15. 배열 항목 수정하기
 > UserList2.js
 >
 > `map()`함수를 이용해 배열의 불변성을 유지하면서 배열을 업데이트(수정)할 수 있다
@@ -398,7 +398,7 @@ https://react.vlpt.us/
   ...
   ```
   
-### useEffect Hook
+### 1-16. useEffect Hook
 > UserList2.js
 >
 > `useEffect` Hook을 활용해 마운트/언마운트/업데이트시 특정 작업을 수행한다
@@ -447,7 +447,7 @@ https://react.vlpt.us/
     <p align='center'><img src ='https://user-images.githubusercontent.com/112890661/215967561-f3173953-3643-455b-9ba3-5fec980b35fc.png' width='350'></p>
   </details>
 
-### useMemo Hook
+### 1-17. useMemo Hook
 > App.js >> countActiveUsers 컴포넌트
 >
 > `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
@@ -487,7 +487,7 @@ https://react.vlpt.us/
   <p align='center'><image src='https://user-images.githubusercontent.com/112890661/215980510-74d51af4-9a17-4422-b42c-bd1d080dd84b.png' width='350'></p>
 - `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
 
-### useCallback Hook
+### 1-18. useCallback Hook
 > App.js
 >
 > `useCallback` Hook을 활용해 함수를 재사용 할 수 있다
@@ -541,7 +541,7 @@ https://react.vlpt.us/
     ```
   </details>
 
-### React.memo 함수
+### 1-19. React.memo 함수
 > App.js, CreateUser.js, UserList2.js
 >
 > `React.memo` 함수를 사용한 컴포넌트 리렌더링 방지
@@ -622,7 +622,7 @@ https://react.vlpt.us/
 - 예를 들어 렌더링 최적화를 하지 않을 컴포넌트에 React.memo를 사용하는 것은 불필요한 props 비교만 하는 것이기 때문에 오히려 불필요한 작업이 늘어나기도 하며, 의도치 않은 버그들이 발생할 수 있기 때문
 
 ## 23.02.02(목)
-### useReducer Hook
+### 1-20. useReducer Hook
 > Counter.js, App.js
 >
 > `useReducer` Hook을 활용해 상태를 관리한다 (`useState`와 유사함)
@@ -881,7 +881,7 @@ https://react.vlpt.us/
 > - 한 함수에서 state setter 함수를 여러번 사용해야 하는 경우, `useReducer` 사용을 고민해볼만 함
 
 
-### 커스텀 Hooks 만들기
+### 1-21. 커스텀 Hooks 만들기
 > useInputs.js, App.js
 >
 > 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 있다.
