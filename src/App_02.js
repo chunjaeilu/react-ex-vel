@@ -4,9 +4,6 @@ import React, { useReducer, useRef, useMemo, useCallback } from "react";
 import UserList2 from "./components/UserList2";
 import CreateUser from "./components/CreateUser";
 
-// 커스텀훅 import
-import useInputs from "./hooks/useInputs";
-
 const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
   return users.filter((user) => user.active).length;
@@ -15,6 +12,10 @@ const countActiveUsers = (users) => {
 
 // App에서 사용할 초기 상태를 컴포넌트 바깥으로 분리 (useReducer를 사용하는 목적이 컴포넌트와 상태 업데이트 로직을 분리하는 것이므로..)
 const initialState = {
+  inputs: {
+    username: "",
+    email: "",
+  },
   users: [
     {
       id: 1,
@@ -40,6 +41,16 @@ const initialState = {
 // reducer() 함수 생성
 function reducer(state, action) {
   switch (action.type) {
+    // action 객체의 type이 'CHANGE_INPUT'일때 실행 (onChange)
+    case "CHANGE_INPUT":
+      return {
+        ...state, // state 객체를 spread 연산자로 펼침
+        inputs: {
+          // state.inputs 선택
+          ...state.inputs, // state.inputs를 spread 연산자로 펼침
+          [action.name]: action.value, // action객체의 name을 선택(이름을 입력하면 name: username, 메일주소를 입력할 때는 name: email)해서 action 객체의 value 값을 반영
+        },
+      };
     // action 객체의 type이 'CREATE_USER'일때 실행 (onCreate)
     case "CREATE_USER":
       return {
@@ -68,19 +79,22 @@ function reducer(state, action) {
 }
 
 function App() {
-  // 삭제된 inputs 관련 작업을 대신할 useInputs 생성
-  // useInputs에서 반환한 form, onChange, reset을 받아 상태를 업데이트 한다
-  const [{ username, email }, onChange, reset] = useInputs({
-    username: "",
-    email: "",
-  });
-  // 초기값 {username: "", email: ""} 가 useInputs에 initialForm 객체로 전달된다
-
   // initialState 객체를 초기값으로 가지는 state 를 useReducer로 관리하겠다는 선언
   const [state, dispatch] = useReducer(reducer, initialState);
   const nextId = useRef(4);
 
   const { users } = state;
+  const { username, email } = state.inputs;
+
+  // onChange 함수
+  const onChange = useCallback((e) => {
+    const { name, value } = e.target;
+    dispatch({
+      type: "CHANGE_INPUT",
+      name,
+      value,
+    });
+  }, []);
 
   // onCreate 함수
   const onCreate = useCallback(() => {
@@ -92,9 +106,8 @@ function App() {
         email,
       },
     });
-    reset(); // 새로운 항목을 추가할때 input 값 초기화 (커스텀 Hook useInputs에서 받아옴)
     nextId.current += 1;
-  }, [username, email, reset]);
+  }, [username, email]);
 
   // onRemove 함수
   const onRemove = useCallback((id) => {
