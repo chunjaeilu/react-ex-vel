@@ -622,18 +622,261 @@ https://react.vlpt.us/
 - 예를 들어 렌더링 최적화를 하지 않을 컴포넌트에 React.memo를 사용하는 것은 불필요한 props 비교만 하는 것이기 때문에 오히려 불필요한 작업이 늘어나기도 하며, 의도치 않은 버그들이 발생할 수 있기 때문
 
 ### useReducer Hook
-> Counter.js
+> Counter.js, App.js
 >
 > `useReducer` Hook을 활용해 상태를 관리한다 (`useState`와 유사함)
 >
 > `useReducer` Hook을 활용하면 상태 업데이트 로직을 컴포넌트에서 분리해 관리할 수 있다.
 
-- 
----
+#### `reducer`
+- `reducer` : 현재 상태와 액션 객체를 파라미터로 받아와서 새로운 상태를 반환해주는 함수
+
+  ```javascript
+  function reducer(state, action) {
+    // 새로운 상태를 만드는 로직
+    // const nextState = ...
+    return nextState;
+  }
+  ```
+- `reducer`함수에서 상태를 관리하는 로직을 만들고 `useReducer`에서 `reducer`함수를 실행시키는 방식으로 사용된다.
+- `reducer`에서 반환(`return`)하는 상태는 컴포넌트가 지닐 새로운 상태가 된다.
+- `action` 파라미터는 업데이트를 위한 정보를 가지고 있다. 주로 `type`값을 지닌 객체 형태로 사용하지만 꼭 따라야 하는 규칙이 있는 것은 아님
   <details>
-    <summary>코드 보기</summary>
-		
+    <summary>예시 보기</summary>
+    
     ```javascript
+    // action 사용 예시
+
+    // 카운터에 1을 더하는 액션
+    {
+      type: 'INCREMENT'
+    }
+
+    // 새 할 일을 등록하는 액션
+    {
+      type: 'ADD_TODO',
+      todo: {
+        id: 1,
+        text: 'useReducer 배우기',
+        done: false,
+      }
+    }
     ```
   </details>
 
+- `action` 객체의 형태는 자유이며, `type` 값은 대문자와 언더바( _ )로 구성하는 암묵적 룰이 있지만 이것 역시 강제되는 것은 아님
+
+#### `useReducer`
+- `useReducer` 기본형
+  ```javascript
+  const [state, dispatch] = useReducer(reducer, initialState);
+  ```
+- `state` : 컴포넌트에서 사용할 수 있는 상태변수
+- `dispatch` : action을 발생시키는 함수 `dispatch({type:'INCREMENT'})`
+- `reducer` : `reducer()`함수 실행시킴
+- `initialState` : 초기값 설정
+- `useReducer` 사용방법
+  - `useReducer`로 관리할 변수를 선언한다
+  ```javascript
+  const [number, dispatch] = useReducer(reducer, 0);
+  ```
+  - 실행할 함수 내부에 상태관리함수 `dispatch`로 action객체를 생성한다
+  ```javascript
+  const onIncrease = () => {
+    dispatch({type:'INCREMENT'});
+    // type이 'INCREMENT'인 action 객체 생성
+  };
+  const onDecrease = () => {
+    dispatch({type:'DECREMENT'});
+    // type이 'DECREMENT'인 action 객체 생성
+  };
+  ```
+  - `reducer`함수에서 전달받은 state와 action 객체를 이용해 각각의 함수에서 변동시킬 로직을 작성한다
+  ```javascript
+  // 여기서 state는 useReducer로 관리를 선언한 number 변수의 현재 상태를 의미한다
+  function reducer(state, action) {
+    switch (action.type) {
+      // action객체의 type이 'INCREMENT'이면 state + 1 을 실행
+      case 'INCREMENT':
+        return state + 1;
+      // action객체의 type이 'DECREMENT'이면 state - 1 을 실행
+      case 'DECREMENT':
+        return state - 1;
+      // action이 없을 때는 state를 그대로 반환(현재 상태 유지)
+      default:
+        return state;
+    }
+  }
+  ```
+- 이를 바탕으로 App.js의 유저리스트를 `useState`가 아닌 `useReducer`로 관리해보자
+  <details>
+    <summary>코드 보기</summary>
+
+    ```javascript
+    // App.js
+    import React, { useReducer, useRef, useMemo, useCallback } from "react";
+
+    import UserList2 from "./components/UserList2";
+    import CreateUser from "./components/CreateUser";
+
+    const countActiveUsers = (users) => {
+      console.log("활성 사용자 수를 세는 중...");
+      return users.filter((user) => user.active).length;
+      // users 배열에서 active가 true인 새로운 배열을 추출하고, 배열의 길이를 리턴
+    };
+
+    // App에서 사용할 초기 상태를 컴포넌트 바깥으로 분리 (useReducer를 사용하는 목적이 컴포넌트와 상태 업데이트 로직을 분리하는 것이므로..)
+    const initialState = {
+      inputs:{
+        username: "",
+        email: "",
+      },
+      users:[
+        {
+          id: 1,
+          username: "velopert",
+          email: "public.velopert@gmail.com",
+          active: true,
+        },
+        {
+          id: 2,
+          username: "tester",
+          email: "tester@example.com",
+          active: false,
+        },
+        {
+          id: 3,
+          username: "liz",
+          email: "liz@example.com",
+          active: false,
+        }
+      ]
+    }
+
+    // reducer() 함수 생성
+    function reducer(state, action) {
+      switch (action.type) {
+        // action 객체의 type이 'CHANGE_INPUT'일때 실행 (onChange)
+        case 'CHANGE_INPUT':
+          return {
+            ...state, // state 객체를 spread 연산자로 펼침
+            inputs: { // state.inputs 선택
+              ...state.inputs, // state.inputs를 spread 연산자로 펼침
+              [action.name]: action.value // action객체의 name을 선택(이름을 입력하면 name: username, 메일주소를 입력할 때는 name: email)해서 action 객체의 value 값을 반영
+            }
+          };
+        // action 객체의 type이 'CREATE_USER'일때 실행 (onCreate)
+        case 'CREATE_USER':
+          return {
+            // inputs 초기화
+            inputs : initialState.inputs,
+            // users 업데이트
+            users: state.users.concat(action.user)
+          };
+        // action 객체의 type이 'REMOVE_USER'일때 실행 (onRemove)
+        case 'REMOVE_USER':
+          return {
+            ...state, // state 객체를 spread 연산자로 펼침
+            users: state.users.filter(user => user.id !== action.id) // users 선택, filter함수를 이용해 아이디값이 전달받은 action.id값(선택한 id값)과 일치하지 않는 users 배열을 리턴
+          };
+        // action 객체의 type이 'TOGGLE_USER'일때 실행 (onToggle)
+        case 'TOGGLE_USER':
+          return {
+            ...state,
+            users: state.users.map(user => user.id === action.id ? {...user, active: !user.active } : user)
+          }
+        default:
+          return state;  
+      }
+    }
+
+    function App() {
+      // initialState 객체를 초기값으로 가지는 state 를 useReducer로 관리하겠다는 선언
+      const [state, dispatch] = useReducer(reducer, initialState);
+      const nextId = useRef(4);
+
+      const { users } = state;
+      const { username, email } = state.inputs;
+
+      // onChange 함수
+      const onChange = useCallback(e => {
+        const {name, value} = e.target;
+        dispatch({
+          type: 'CHANGE_INPUT',
+          name,
+          value
+        })
+      },[])
+
+      // onCreate 함수
+      const onCreate = useCallback(() => {
+        dispatch({
+          type: 'CREATE_USER',
+          user: {
+            id: nextId.current,
+            username,
+            email
+          }
+        });
+        nextId.current += 1;
+      },[username, email])
+
+      // onRemove 함수
+      const onRemove = useCallback((id) => {
+        dispatch({
+          type: 'REMOVE_USER',
+          id
+        });
+      },[])
+
+      // onToggle 함수
+      const onToggle = useCallback((id) => {
+        dispatch({
+          type: 'TOGGLE_USER',
+          id
+        })
+      },[])
+
+      // countActiveUsers 함수 실행
+      const count = useMemo(() => countActiveUsers(users), [users]);
+
+      return (
+        <>
+          <CreateUser
+            username={username}
+            email={email}
+            onChange={onChange}
+            onCreate={onCreate}
+          />
+          <UserList2
+            users={users}
+            onRemove={onRemove}
+            onToggle={onToggle}
+          />
+
+          <div>활성 사용자 수 : {count}</div>
+        </>
+      );
+    }
+
+    export default App;
+
+    ```
+  </details>
+>#### Tip!!
+> reducer 함수에서도 비구조화 할당을 할 수 있다. 
+>  - 위 코드에서는 state가 내부의 inputs와 users의 구조로 불변하기 때문에 이 부분에 대해서
+>  ```javascript
+>  const { users, inputs } = state;
+>  const { name, value, user, id } = action;
+>  ```
+>  - 와 같은 식으로 작성한다면, state.users를 users로 축약할 수 있고 onCreate에서 username, email과 같이 따로따로 적던 부분도 ...inputs로 작성할 수 있다
+>  - `action`의 경우 type에 따라 받아오는 값이 다르므로 할당연산을 할 수 없다 생각할 수 있지만, 받아오지 않는 값은 undefined로 처리하기 때문에 타입합수에서 undefined 요소를 사용하려 하지만 않는다면 비구조화 할당을 해도 상관없다
+---
+  <details>
+    <summary>코드 보기</summary>
+
+    ```javascript
+
+    ```
+  </details>
