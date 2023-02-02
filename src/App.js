@@ -3,6 +3,7 @@ import React, { useState, useRef, useMemo, useCallback } from "react";
 
 import UserList2 from "./components/UserList2";
 import CreateUser from "./components/CreateUser";
+import Counter from "./components/Counter";
 
 const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
@@ -110,6 +111,10 @@ function App() {
       <UserList2 users={users} onRemove={onRemove} onToggle={onToggle} />
 
       <div>활성 사용자 수 : {count}</div>
+
+      <hr />
+
+      <Counter />
     </>
   );
 }
