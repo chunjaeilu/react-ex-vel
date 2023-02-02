@@ -621,6 +621,7 @@ https://react.vlpt.us/
 - 단, `useCallback`, `useMemo`, `React.memo`를 이용한 렌더링 최적화는 컴포넌트의 성능을 실제로 개선할 수 있는 상황에서만 사용하는 것이 좋다
 - 예를 들어 렌더링 최적화를 하지 않을 컴포넌트에 React.memo를 사용하는 것은 불필요한 props 비교만 하는 것이기 때문에 오히려 불필요한 작업이 늘어나기도 하며, 의도치 않은 버그들이 발생할 수 있기 때문
 
+## 23.02.02(목)
 ### useReducer Hook
 > Counter.js, App.js
 >
@@ -872,6 +873,7 @@ https://react.vlpt.us/
 >  ```
 >  - 와 같은 식으로 작성한다면, state.users를 users로 축약할 수 있고 onCreate에서 username, email과 같이 따로따로 적던 부분도 ...inputs로 작성할 수 있다
 >  - `action`의 경우 type에 따라 받아오는 값이 다르므로 할당연산을 할 수 없다 생각할 수 있지만, 받아오지 않는 값은 undefined로 처리하기 때문에 타입합수에서 undefined 요소를 사용하려 하지만 않는다면 비구조화 할당을 해도 상관없다
+
 ---
   <details>
     <summary>코드 보기</summary>
