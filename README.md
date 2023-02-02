@@ -621,6 +621,14 @@ https://react.vlpt.us/
 - 단, `useCallback`, `useMemo`, `React.memo`를 이용한 렌더링 최적화는 컴포넌트의 성능을 실제로 개선할 수 있는 상황에서만 사용하는 것이 좋다
 - 예를 들어 렌더링 최적화를 하지 않을 컴포넌트에 React.memo를 사용하는 것은 불필요한 props 비교만 하는 것이기 때문에 오히려 불필요한 작업이 늘어나기도 하며, 의도치 않은 버그들이 발생할 수 있기 때문
 
+### useReducer Hook
+> Counter.js
+>
+> `useReducer` Hook을 활용해 상태를 관리한다 (`useState`와 유사함)
+>
+> `useReducer` Hook을 활용하면 상태 업데이트 로직을 컴포넌트에서 분리해 관리할 수 있다.
+
+- 
 ---
   <details>
     <summary>코드 보기</summary>
