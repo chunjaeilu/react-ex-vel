@@ -628,7 +628,7 @@ https://react.vlpt.us/
 >
 > `useReducer` Hook을 활용하면 상태 업데이트 로직을 컴포넌트에서 분리해 관리할 수 있다.
 
-#### `reducer`
+#### reducer
 - `reducer` : 현재 상태와 액션 객체를 파라미터로 받아와서 새로운 상태를 반환해주는 함수
 
   ```javascript
@@ -666,7 +666,7 @@ https://react.vlpt.us/
 
 - `action` 객체의 형태는 자유이며, `type` 값은 대문자와 언더바( _ )로 구성하는 암묵적 룰이 있지만 이것 역시 강제되는 것은 아님
 
-#### `useReducer`
+#### useReducer
 - `useReducer` 기본형
   ```javascript
   const [state, dispatch] = useReducer(reducer, initialState);
