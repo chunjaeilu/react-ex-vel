@@ -865,7 +865,7 @@ https://react.vlpt.us/
     ```
   </details>
 >#### Tip!!
-> reducer 함수에서도 비구조화 할당을 할 수 있다. 
+> <b>reducer 함수에서도 비구조화 할당을 할 수 있다.</b>
 >  - 위 코드에서는 state가 내부의 inputs와 users의 구조로 불변하기 때문에 이 부분에 대해서
 >  ```javascript
 >  const { users, inputs } = state;
@@ -874,7 +874,22 @@ https://react.vlpt.us/
 >  - 와 같은 식으로 작성한다면, state.users를 users로 축약할 수 있고 onCreate에서 username, email과 같이 따로따로 적던 부분도 ...inputs로 작성할 수 있다
 >  - `action`의 경우 type에 따라 받아오는 값이 다르므로 할당연산을 할 수 없다 생각할 수 있지만, 받아오지 않는 값은 undefined로 처리하기 때문에 타입합수에서 undefined 요소를 사용하려 하지만 않는다면 비구조화 할당을 해도 상관없다
 
----
+>#### useState vs useReducer
+><b> 복잡한 구조가 아니라면 `useState`를 유지하는게 편하다.</b>
+> - 컴포넌트에서 관리하는 값이 하나이고, 그 값이 단순한 숫자, 문자열 또는 boolean 값이라면 `useState` 로 관리하는게 편하고
+> - 컴포넌트에서 관리하는 값이 여러개가 되어서 상태의 구조가 복잡해진다면 `useReducer`로 관리하는게 편할 수 있다.
+> - 한 함수에서 state setter 함수를 여러번 사용해야 하는 경우, `useReducer` 사용을 고민해볼만 함
+
+
+### 커스텀 Hooks 만들기
+> Inputs.js
+>
+> 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 있다.
+
+- 커스텀 Hooks는 src 디렉토리에 hooks 라는 디렉토리를 만들고, 그 안에 useSomething.js 파일로 관리한다.
+
+
+## 자주 쓰는 태그
   <details>
     <summary>코드 보기</summary>
 
