@@ -1054,8 +1054,8 @@ https://react.vlpt.us/
   <b
     ... 
     onClick={() => {
-          dispatch({ type: "TOGGLE_USER", id: user.id });
-        }}
+      dispatch({ type: "TOGGLE_USER", id: user.id });
+    }}
   />
   <button
     onClick={() => {
