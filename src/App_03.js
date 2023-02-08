@@ -1,8 +1,11 @@
 import "./App.css";
-import React, { useReducer, useMemo } from "react";
+import React, { useReducer, useRef, useMemo, useCallback } from "react";
 
-import UserList from "./components/UserList";
+import UserList2 from "./components/UserList2";
 import CreateUser from "./components/CreateUser";
+
+// 커스텀훅 import
+import useInputs from "./hooks/useInputs";
 
 const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
@@ -40,6 +43,8 @@ function reducer(state, action) {
     // action 객체의 type이 'CREATE_USER'일때 실행 (onCreate)
     case "CREATE_USER":
       return {
+        // inputs 초기화
+        inputs: initialState.inputs,
         // users 업데이트
         users: state.users.concat(action.user),
       };
@@ -62,28 +67,66 @@ function reducer(state, action) {
   }
 }
 
-// UserDispatch 라는 Context 생성 및 내보내기
-// React.createContext(기본값) : Context 생성 함수
-export const UserDispatch = React.createContext(null);
-
 function App() {
+  // 삭제된 inputs 관련 작업을 대신할 useInputs 생성
+  // useInputs에서 반환한 form, onChange, reset을 받아 상태를 업데이트 한다
+  const [{ username, email }, onChange, reset] = useInputs({
+    username: "",
+    email: "",
+  });
+  // 초기값 {username: "", email: ""} 가 useInputs에 initialForm 객체로 전달된다
+
   // initialState 객체를 초기값으로 가지는 state 를 useReducer로 관리하겠다는 선언
   const [state, dispatch] = useReducer(reducer, initialState);
+  const nextId = useRef(4);
 
   const { users } = state;
+
+  // onCreate 함수
+  const onCreate = useCallback(() => {
+    dispatch({
+      type: "CREATE_USER",
+      user: {
+        id: nextId.current,
+        username,
+        email,
+      },
+    });
+    reset(); // 새로운 항목을 추가할때 input 값 초기화 (커스텀 Hook useInputs에서 받아옴)
+    nextId.current += 1;
+  }, [username, email, reset]);
+
+  // onRemove 함수
+  const onRemove = useCallback((id) => {
+    dispatch({
+      type: "REMOVE_USER",
+      id,
+    });
+  }, []);
+
+  // onToggle 함수
+  const onToggle = useCallback((id) => {
+    dispatch({
+      type: "TOGGLE_USER",
+      id,
+    });
+  }, []);
 
   // countActiveUsers 함수 실행
   const count = useMemo(() => countActiveUsers(users), [users]);
 
   return (
-    // 생성된 Context(UserDispatch) 내부에 생성되는 Provider 컴포넌트를 통해서 Context 값을 지정할 수 있다.
-    // value 값을 설정하면 Provider로 감싸진 모든 컴포넌트에서 언제든지 Context 값(여기서는 dispatch)을 꺼내 쓸 수 있게 된다.
-    <UserDispatch.Provider value={dispatch}>
-      <CreateUser />
-      <UserList users={users} />
+    <>
+      <CreateUser
+        username={username}
+        email={email}
+        onChange={onChange}
+        onCreate={onCreate}
+      />
+      <UserList2 users={users} onRemove={onRemove} onToggle={onToggle} />
 
       <div>활성 사용자 수 : {count}</div>
-    </UserDispatch.Provider>
+    </>
   );
 }
 

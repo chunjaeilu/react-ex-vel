@@ -40,7 +40,7 @@ const User = React.memo(({ user, onRemove, onToggle }) => {
           // user.active가 true이면 color를 'green', false이면 'black' 으로 설정
         }}
         onClick={() => onToggle(user.id)}
-        // 사용자가 선택한(마우스를 올린) 유저정보 id를 매개변수로 전달
+        // 사용자가 선택한 유저정보 id를 매개변수로 전달
       >
         {user.username}
       </b>{" "}
