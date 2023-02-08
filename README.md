@@ -110,7 +110,7 @@ https://react.vlpt.us/
   </details>
   
 ### 1-11. 배열 렌더링하기
-> UserList.js
+> UserList_01.js
 >
 > `map()`함수로 배열 렌더링 하기
 >
@@ -133,7 +133,7 @@ https://react.vlpt.us/
 - 단, index를 참조할 때는 각 요소의 key값이 고정된 것이 아니라 배열을 추가하고 삭제하는 과정에서 바뀔 수 있으므로 배열의 원소가 고유한 값을 이미 가지고 있다면 가능한한 해당 값을 key값으로 사용하는 것을 권장한다.
 
 ### 1-12. useRef로 컴포넌트 안의 변수 관리하기
-> UserList2.js, CreateUser.js
+> UserList_02.js, CreateUser_01.js
 >
 > useRef를 활용해 컴포넌트 안의 변수를 생성
 
@@ -143,7 +143,7 @@ https://react.vlpt.us/
 - Ref로 관리할 변수 생성 : `const nextId = useRef(4);`
 
 ### 1-13. 배열에 항목 추가하기
-> UserList2.js, CreateUser.js
+> UserList_02.js, CreateUser_01.js
 >
 > 스프레드 연산자로 배열에 새로운 항목 추가 (Create)
 > Create함수 props로 전달하고 자식 컴포넌트에서 항목 추가 요청
@@ -279,7 +279,7 @@ https://react.vlpt.us/
   </details>
 
 ### 1-14. 배열에서 항목 제거하기
-> UserList2.js
+> UserList_02.js
 >
 > 삭제함수 props로 전달하고 자식 컴포넌트에서 항목 삭제 요청
 > 
@@ -328,7 +328,7 @@ https://react.vlpt.us/
 
 ## 23.02.01(수)
 ### 1-15. 배열 항목 수정하기
-> UserList2.js
+> UserList_02.js
 >
 > `map()`함수를 이용해 배열의 불변성을 유지하면서 배열을 업데이트(수정)할 수 있다
 >
@@ -399,7 +399,7 @@ https://react.vlpt.us/
   ```
   
 ### 1-16. useEffect Hook
-> UserList2.js
+> UserList_02.js
 >
 > `useEffect` Hook을 활용해 마운트/언마운트/업데이트시 특정 작업을 수행한다
 
@@ -448,7 +448,7 @@ https://react.vlpt.us/
   </details>
 
 ### 1-17. useMemo Hook
-> App.js >> countActiveUsers 컴포넌트
+> App_01.js >> countActiveUsers 컴포넌트
 >
 > `useMemo` Hook을 활용해 연산한 값을 재사용 할 수 있다.
 
@@ -488,7 +488,7 @@ https://react.vlpt.us/
 - `input` 값이 바뀌어도 users 배열의 내용은 변하지 않기 때문에 불필요한 함수호출이 일어나지 않는다.
 
 ### 1-18. useCallback Hook
-> App.js
+> App_01.js
 >
 > `useCallback` Hook을 활용해 함수를 재사용 할 수 있다
 
@@ -542,7 +542,7 @@ https://react.vlpt.us/
   </details>
 
 ### 1-19. React.memo 함수
-> App.js, CreateUser.js, UserList2.js
+> App_01.js, CreateUser_01.js, UserList_02.js
 >
 > `React.memo` 함수를 사용한 컴포넌트 리렌더링 방지
   
@@ -623,7 +623,7 @@ https://react.vlpt.us/
 
 ## 23.02.02(목)
 ### 1-20. useReducer Hook
-> Counter.js, App.js
+> Counter.js, App_02.js
 >
 > `useReducer` Hook을 활용해 상태를 관리한다 (`useState`와 유사함)
 >
@@ -882,7 +882,7 @@ https://react.vlpt.us/
 
 
 ### 1-21. 커스텀 Hooks 만들기
-> useInputs.js, App.js
+> App_02.js, useInputs.js, useInputs_01.js
 >
 > 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 있다.
 
@@ -997,15 +997,87 @@ https://react.vlpt.us/
       }
     }
     ```
-</details>
+  </details>
+
+## 23.02.08(수)
+### 1-22. Context API를 사용한 전역 값 관리
+> App.js, UserList.js, CreateUser.js
+>
+> Context API를 활용해 프로젝트 안에서 **전역적**으로 사용하는 값을 관리할 수 있다
+
+#### Context API 사용목적
+- 일반적인 리액트 프로젝트에서 상위 컴포넌트에서 선언된 데이터는 하위 컴포넌트에 props 를 통해 전달된다.
+- 구조가 단순한 프로젝트는 크게 상관없겠지만 컴포넌트 구조가 복잡한 프로젝트는 여러개의 컴포넌트를 거쳐 전달되어야 하는 경우가 생길 수 있는데,
+- 전달과정 자체가 번거로워질 뿐만 아니라 오류가 발생하기도 쉽다.
+- Context API를 사용하면 프로젝트 안에서 전역적으로 사용하는 값을 관리할 수 있는데, '상위>하위>차하위' 로 연결되는 전달과정을 단순화 하고, 선언된 값을 프로젝트 어디서나 자유롭게 꺼내 쓸 수 있다는 장점이 있다.
+
+#### Context API 사용방법
+##### App.js
+- `UserDispatch` 라는 Context 생성 및 내보내기
+  - `React.createContext(defaultValue)` : Context 생성 함수
+  - Context(여기서는 `UserDispatch`) 객체를 구독하고있는 컴포넌트를 렌더링 할 때 React는 트리 상위에서 가장 가까이 있는 짝이 맞는 `Provider` 컴포넌트를 통해서 현재값을 읽어오는데, `defaultValue` 매개변수는 트리 안에서 적절한 `Provider`를 찾지 못했을 때 쓰이는 값
+- `<Context명.Provider>` 태그로 렌더링 할 컴포넌트들을 감싸고 `value` 값을 설정하면 감싸진 모든 컴포넌트에서 언제든지 Context 값(여기서는 dispatch)을 꺼내 쓸 수 있게 된다.
+  - 여기서 `Provider`컴포넌트는 `value` 값을 props로 하위 컴포넌트에 전달하는 역할
+  - `Provider` 하위에 또다른 `Provider`를 배치하는 것도 가능하며, 이 경우 하위 `Provider`가 우선한다
+  - context를 구독하고 있는 하위 컴포넌트들은 `Provider`의 `value` props가 바뀔 때마다 렌더링 된다. (`Provider`는 하위 컴포넌트에 context의 변화를 알리는 역할)
+- 하위 컴포넌트에 `props`로 전달하던 변수와 함수를 삭제
+  - `reducer()` 함수를 호출하는 기능만 수행하던 함수는 삭제 (하위 컴포넌트에서 직접 reducer 호출)
+  - 재사용이 필요 없는 함수는 해당 함수를 직접 사용하는 하위 컴포넌트로 이동
+  ```javascript
+  // App.js
+  ...
+  export const UserDispatch = React.createContext(null);
+  ...
+  function App() {
+    return (
+      <UserDispatch.Provider value={dispatch}>
+        <CreateUser />
+        <UserList users={users} />
+
+        <div>활성 사용자 수 : {count}</div>
+      </UserDispatch.Provider>
+    )
+  }
+  ```
+##### UserList.js > User 컴포넌트
+- `useContext` Hook과 App.js에서 export한 Context(`UserDispatch`) import
+  ```javascript
+  import React, { useContext } from "react";
+  import { UserDispatch } from "../App";
+  ```
+- `useContext` Hook을 통해 구독(조회)할 Context를 변수(dispatch)에 저장
+  ```javascript
+  const dispatch = useContext(UserDispatch);
+  ```
+- `props`를 전달받아 함수를 호출하던 이벤트핸들러에 `reducer()`를 호출하는 `dispatch()`함수 직접 선언 (상위 컴포넌트에 onToggle, onRemove 함수 실행을 요청하는 과정을 하위 컴포넌트에서 직접 수행)
+  ```javascript
+  <b
+    ... 
+    onClick={() => {
+          dispatch({ type: "TOGGLE_USER", id: user.id });
+        }}
+  />
+  <button
+    onClick={() => {
+      dispatch({ type: "REMOVE_USER", id: user.id });
+    }}
+  >
+    삭제
+  </button>
+  ```
+##### CreateUser.js
+- input요소 및 `onCreate()` 함수 관련 로직을 하위 컴포넌트로 이동시킴
+  - 해당 함수 및 변수는 다른 컴포넌트에서 재사용 하지 않고 CreateUser 컴포넌트에서만 사용하므로
+- dispatch를 하위 컴포넌트에서 직접 사용해야 하므로 `useContext` Hook과 `UserDispatch` Context를 import 하고 Context를 구독할 번수(dispatch)를 선언하는 과정은 동일하게 진행해줘야 한다.
+- 관련 코드는 생략
 
 ## 재사용
 
 ## 23.02.02(목)
-### 커스텀 Hooks 만들기
+### 1-21. Context API를 사용한 전역 값 관리
 > Inputs.js
 >
-> 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 
+> Context API를 활용해프로젝트 안에서 전역적으로 사용하는 값을 관리할 수 있다
 
 <details>
   <summary>코드 보기</summary>
