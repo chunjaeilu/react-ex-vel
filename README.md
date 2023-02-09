@@ -1133,9 +1133,8 @@ https://react.vlpt.us/
   ```
 
 #### `reducer`에서 Immer 사용하기
-> `users` 의 상태를 관리하는 `reducer()` 함수에서 Immer 라이브러리를 사용해 상태관리를 해보자
->
-> `push`, `splice` 등 배열을 직접 수정하는 함수를 사용해도 불변성을 지킬 수 있다.
+- `users` 의 상태를 관리하는 `reducer()` 함수에서 Immer 라이브러리를 사용해 상태관리를 해보자
+- `push`, `splice` 등 배열을 직접 수정하는 함수를 사용해도 불변성을 지킬 수 있다.
   ```javascript
   // reducer() 함수 생성
   function reducer(state, action) {
