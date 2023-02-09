@@ -3,6 +3,7 @@ import React, { useReducer, useMemo } from "react";
 
 import UserList from "./components/UserList";
 import CreateUser from "./components/CreateUser";
+import produce from "immer";
 
 const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
@@ -39,24 +40,22 @@ function reducer(state, action) {
   switch (action.type) {
     // action 객체의 type이 'CREATE_USER'일때 실행 (onCreate)
     case "CREATE_USER":
-      return {
+      return produce(state, (draft) => {
         // users 업데이트
-        users: state.users.concat(action.user),
-      };
+        draft.users.push(action.user);
+      });
     // action 객체의 type이 'REMOVE_USER'일때 실행 (onRemove)
     case "REMOVE_USER":
-      return {
-        ...state, // state 객체를 spread 연산자로 펼침
-        users: state.users.filter((user) => user.id !== action.id), // users 선택, filter함수를 이용해 아이디값이 전달받은 action.id값(선택한 id값)과 일치하지 않는 users 배열을 리턴
-      };
+      return produce(state, (draft) => {
+        const index = draft.users.findIndex((user) => user.id === action.id);
+        draft.users.splice(index, 1);
+      });
     // action 객체의 type이 'TOGGLE_USER'일때 실행 (onToggle)
     case "TOGGLE_USER":
-      return {
-        ...state,
-        users: state.users.map((user) =>
-          user.id === action.id ? { ...user, active: !user.active } : user
-        ),
-      };
+      return produce(state, (draft) => {
+        const user = draft.users.find((user) => user.id === action.id);
+        user.active = !user.active;
+      });
     default:
       return state;
   }

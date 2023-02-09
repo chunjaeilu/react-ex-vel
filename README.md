@@ -1072,23 +1072,159 @@ https://react.vlpt.us/
 - 관련 코드는 생략
 
 ## 23.02.09(목)
-### 1-23. Immer를 사용한 더 쉬운 불변성 관리
-> Inputs.js
+### 1-23. Immer를 사용한 불변성 관리
+> App.js
 >
-> 개발자가 불변성에 신경 쓰지 않더라도 Immer가 불변성 관리를 대신 해준다
+> Immer를 사용해 쉽게 불변성 관리를 할 수 있다
 
-#### install
-```cmd
-npm install immer
-```
-```cmd
-yarn add immer
-```
+#### 불변성이란?
+- 메모리 영역에서 값이 변하지 않는다는 것
+- 원본 데이터 (변수, 배열, 상태 등)를 훼손하지 않고 새로운 영역에 할당하여 수정하는 개념
+- 리액트에서는 상태값을 업데이트 할때 얕은 비교를 수행(배열이나 객체의 속성 하나하나를 비교하는게 아니라 이전 참조값과 현재 참조값만을 비교하여 상태변화를 감지 
+- 배열이나 객체를 업데이트 할 때 직접 그 값을 변경하는것이 아니라 복사한 배열을 수정하거나 스프레드연산자, `concat()` 등을 사용하는 것도 불변성을 지키기 위한 이유
 
-#### import
-```javascript
-import produce from 'immer';
-```
+#### 불변성을 지켜야 하는 이유
+- 효율적인 상태 업데이트
+  - 얕은 비교를 통해 객체의 참조 주소값만 변경되었는지 확인한다
+  - 계산 리소스를 줄여주고 효율적으로 상태를 업데이트 할 수 있다
+- 불필요한 사이드이펙트 방지
+  - 하나의 작업에서 원본데이터가 직접 변경될 경우, 원본데이터를 참조하고 있는 또다른 함수나 컴포넌트가 있다면 의도치 않은 사이드이펙트가 일어날 수 있다.
+  - 프로그래밍의 복잡도 역시 올라간다.
+  - 불변성을 지켜주면 사이드이펙트를 방지하고 프로그래밍 구조를 단순화 할 수 있다.
+
+#### Immer 사용법
+> Immer 라이브러리의 핵심은 **불변성에 신경쓰지 않는 것처럼 코드를 작성하되, 불변성 관리는 제대로 해주는 것**
+>
+> 상태를 업데이트 하는 배열이 객체의 깊은곳에 위치하지 않아 상대적으로 참조가 쉬운 경우, Immer를 사용하는 것보다 `concat`이나 `filter`를 사용하는게 더 간결할 수 있다.
+> 
+> 상황에 맞게 사용 여부를 판단할수 있도록 해야 함.
+
+- install 
+  ```cmd
+  npm install immer
+  ```
+  ```cmd
+  yarn add immer
+  ```
+
+- import : 강제는 아니지만 보통 `produce`라는 이름으로 불러온다
+  ```javascript
+  import produce from 'immer';
+  ```
+- `produce()` 함수 기본 사용법
+  - 첫 번째 params : 수정하고싶은 상태 입력 (불변성 유지)
+  - 두 번째 params : 업데이트를 정의하는 함수 입력 (새로운 상태 생성)
+  - **두 번째 params에 작성한 함수에서 불변성에 대해 신경쓰지 않고 업데이트 해도 immer 라이브러리가 불변성을 지켜준다**
+  ```javascript
+  // immer로 관리할 변수(상태)
+  const state = {
+    number: 1,
+    dontChangeMe: 2
+  };
+
+  // state : 수정할 상태
+  // draft : 상태 업데이트 함수
+  const nextState = produce(state, (draft) => {
+    draft.number += 1;
+  });
+
+  console.log(nextState);
+  // { number: 2, dontChangeMe: 2 }
+  ```
+
+#### `reducer`에서 Immer 사용하기
+> `users` 의 상태를 관리하는 `reducer()` 함수에서 Immer 라이브러리를 사용해 상태관리를 해보자
+>
+> `push`, `splice` 등 배열을 직접 수정하는 함수를 사용해도 불변성을 지킬 수 있다.
+  ```javascript
+  // reducer() 함수 생성
+  function reducer(state, action) {
+    switch (action.type) {
+      case "CREATE_USER":
+        return produce(state, (draft) => {
+          // 기존 코드
+          users: state.users.concat(action.user),
+          
+          // immer 사용 코드
+          draft.users.push(action.user);
+        });
+      case "REMOVE_USER":
+        return produce(state, (draft) => {
+          // 기존 코드
+          ...state, 
+          users: state.users.filter((user) => user.id !== action.id)
+          
+          // immer 사용 코드
+          const index = draft.users.findIndex((user) => user.id === action.id);
+          draft.users.splice(index, 1);
+        });
+      case "TOGGLE_USER":
+        return produce(state, (draft) => {
+          // 기존 코드
+          ...state,
+          users: state.users.map((user) =>
+            user.id === action.id ? { ...user, active: !user.active } : user
+          ),
+
+          // immer 사용 코드
+          const user = draft.users.find((user) => user.id === action.id);
+          user.active = !user.active;
+        });
+      default:
+        return state;
+    }
+  }
+  ```
+
+#### Immer와 함수형 업데이트
+- 함수형 업데이트
+  - `setTodo` 함수에 함수형 업데이트를 사용함으로써 `useCallback` 함수의 `deps` 배열에 상태변수 `todo` 를 생략해도 최신 상태를 반영하게 된다.
+  ```javascript
+  const [todo, setTodo] = useState({
+    text: 'Hello',
+    done: false
+  });
+
+  const onClick = useCallback(() => {
+    setTodo(todo => ({
+      ...todo,
+      done: !todo.done
+    }));
+  }, []);
+  ```
+- Immer를 사용한 함수형 업데이트
+  - `produce` 함수에 두 개의 파라미터를 넣어주면, 첫 번째 파라미터에 넣은 상태의 불변성을 유지하면서 새로운 상태를 만들지만
+  - 첫 번째 파라미터(state, 여기서는 todo)를 생략하면, 함수에서 반환하는 값은 새로운 상태를 생성하는 것이 아니라 상태를 업데이트 해주는 함수가 된다.
+  ```javascript
+  const todo = {
+    text: 'Hello',
+    done: false
+  };
+
+  const updater = produce(draft => {
+    draft.done = !draft.done;
+  });
+
+  const nextTodo = updater(todo);
+
+  console.log(nextTodo);
+  // { text: 'Hello', done: true }
+  ```
+- 결국, `produce`가 반환하는 것이 업데이트 함수가 되기 때문에 `useState`의 함수형 업데이트에 `produce`를 활용할 수 있다.
+  ```javascript
+    const [todo, setTodo] = useState({
+    text: 'Hello',
+    done: false
+  });
+
+  const onClick = useCallback(() => {
+    setTodo(
+      produce(draft => {
+        draft.done = !draft.done;
+      })
+    );
+  }, []);
+  ```
 
 
 ## 재사용
