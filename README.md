@@ -1071,6 +1071,26 @@ https://react.vlpt.us/
 - dispatch를 하위 컴포넌트에서 직접 사용해야 하므로 `useContext` Hook과 `UserDispatch` Context를 import 하고 Context를 구독할 번수(dispatch)를 선언하는 과정은 동일하게 진행해줘야 한다.
 - 관련 코드는 생략
 
+## 23.02.09(목)
+### 1-23. Immer를 사용한 더 쉬운 불변성 관리
+> Inputs.js
+>
+> 개발자가 불변성에 신경 쓰지 않더라도 Immer가 불변성 관리를 대신 해준다
+
+#### install
+```cmd
+npm install immer
+```
+```cmd
+yarn add immer
+```
+
+#### import
+```javascript
+import produce from 'immer';
+```
+
+
 ## 재사용
 
 ## 23.02.02(목)
