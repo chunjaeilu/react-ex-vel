@@ -4,6 +4,8 @@ import React, { useReducer, useMemo } from "react";
 import UserList from "./components/UserList";
 import CreateUser from "./components/CreateUser";
 import produce from "immer";
+import Hello from "./components/Hello";
+import Wrapper from "./components/Wrapper";
 
 const countActiveUsers = (users) => {
   console.log("활성 사용자 수를 세는 중...");
@@ -82,6 +84,10 @@ function App() {
       <UserList users={users} />
 
       <div>활성 사용자 수 : {count}</div>
+      <Wrapper>
+        <Hello name="react" color="red" isSpecial />
+        <Hello color="pink" />
+      </Wrapper>
     </UserDispatch.Provider>
   );
 }

@@ -623,7 +623,7 @@ https://react.vlpt.us/
 
 ## 23.02.02(목)
 ### 1-20. useReducer Hook
-> Counter.js, App_02.js
+> Counter_01.js, App_02.js
 >
 > `useReducer` Hook을 활용해 상태를 관리한다 (`useState`와 유사함)
 >
@@ -1225,6 +1225,180 @@ https://react.vlpt.us/
   }, []);
   ```
 
+## 23.02.13(월)
+### 1-24. 클래스형 컴포넌트
+> Hello.js, Counter.js, index.js
+>
+> 함수형 컴포넌트 외에도 클래스형 컴포넌트를 사용할 수 있다.
+
+#### 과거의 유산, 클래스형 컴포넌트
+- 클래스형 컴포넌트는 React v16.8 이전까지 리액트 프로젝트에서 컴포넌트를 선언하는 방식으로 사용
+- 지금은 함수형 컴포넌트와 Hook을 사용할 것을 권장하므로 잘 사용하지 않음
+- 간혹 클래스형 컴포넌트를 사용한 프로젝트를 유지보수 하거나 함수형 컴포넌트로 해결되지 않는 작업을 수행할 때 필요하므로 사용방법은 익혀두는 것이 좋다.
+
+#### 컴포넌트
+> 컴포넌트는 단순한 템플릿(데이터가 주어졌을 때 이에 맞추어 UI를 만들어주는 기능) 이상의 기능을 수행한다
+>
+> ***라이프사이클 API를 통해 컴포넌트가 화면에 나타날 때, 사라질 때, 변할 때 작업을 수행할 수 있다.***
+
+#### 함수형 컴포넌트 vs 클래스형 컴포넌트
+> ##### 클래스형 컴포넌트
+>
+> > stateful 컴포넌트 라고도 함 (로직과 상태를 컴포넌트 내에서 구현)
+> >
+> > state 기능 및 라이프사이클 기능을 수행할 수 있음
+> >
+> > 임의 메서드를 정의할 수 있음
+> > 
+> > render 함수를 반드시 포함해야 하고, 그 안에서 보여줄 JSX를 반환(return)
+> >
+> > class 문법을 사용해 과거 prototype을 이요해 구현하던 클래스 문법 구현 가능 (ES6~)
+> > 
+> > 클래스 내의 `constructor` 메서드에서 state의 초기값을 설정해주어야 함
+> >
+> > `constructor`를 작성할 때 `super(props)`를 반드시 호출해주어야 함
+> >
+> > state를 조회할 때는 `this.state`로, state의 값을 변경할 때는 `this.setState` 함수를 사용
+> 
+> ##### 함수형 컴포넌트
+>
+> > stateless 컴포넌트 라고도 함 (state를 직접 사용하지 않고 단순하게 데이터를 받아서 UI에 뿌려주기 때문)
+> >
+> > 클래스형 컴포넌트에 비해 선언하기가 편하고, 메모리 자원을 덜 사용함
+> > 
+> > 과거에는 state와 라이프사이클 API를 사용할 수 없었지만, Hook이 도입되면서 사용 가능해짐 
+
+
+#### 클래스형 컴포넌트 사용방법
+- 컴포넌트 API 선언
+  ```javascript
+  // Hello.js
+  import React, { Component } from "react";
+  ```
+- 클래스형 컴포넌트 선언
+  ```javascript
+  class Hello extends Component {
+    // static : props 기본값 설정
+    static defaultProps = {
+      name: '이름없음'
+    };
+
+    // render() 메소드 : 이 안에 렌더링 하고싶은 JSX 반환, 필수요소
+    render() {
+      // this.props : props 조회
+      const { color, name, isSpecial } = this.props;
+
+      return (
+        <div style={{ color }}>
+          {isSpecial && <b>*</b>}
+          안녕하세요 {name}
+        </div>
+      );
+    }
+  }
+  ```
+
+#### Counter.js를 클래스형 컴포넌트로 바꿔보기
+- 화면에 렌더링 (App.js는 기존 작업물이 많으므로 index.js에 Counter컴포넌트를 직접 불러온다)
+  ```javascript
+  // index.js
+  ...
+  import Counter from "./components/Counter";
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(<Counter />);
+  ```
+- 클래스형 컴포넌트 생성 및 커스텀 메서드 만들기
+  - 컴포넌트에서 특정 이벤트를 처리할 때는 클래스 안에 커스텀메서드를 만들어 사용한다.
+  - 메서드 : 클래스 내부에 종속된 함수, 보통 `handle...`이라고 이름 지음
+  - 상태를 업데이트 할 때는 메서드에서 `this.setState` 함수를 사용
+  - `this` : 선택한 컴포넌트 인스턴스를 가리킴
+  - `this`가 컴포넌트 인스턴스를 가리키기 위해 메서드와 컴포넌트 인스턴스간의 관계를 유지시키도록 추가작업이 필요 (bind)
+  - 커스텀메서드를 선언 할 때 화살표함수를 이용하면 `bind`작업을 간단히 수행할 수 있다 (javascript 공식 문법은 아니나 CRA로 만든 프로젝트에서 많이 사용)
+  ```javascript
+  class Counter extends Component {
+    // 1. 클래스의 생성자 메서드 constructor 에서 bind 작업
+    // constructor : 클래스의 생성자 메서드, props 파라미터 받아옴
+    // constructor(props) {
+      // super(props) : 파라미터 호출
+      // super(props);
+      // bind : 해당 함수에서 가리킬 this를 직접 설정
+      // 이 클래스(Counter)가 컴포넌트로서 작동할 수 있도록 해주는 Component API쪽에 구현되어 있는 생성자함수를 먼저 실행해주고, 우리가 할 작업을 하겠다 라는 의미
+      // this.handleIncrease = this.handleIncrease.bind(this);
+      // this.handleDecrease = this.handleDecrease.bind(this);
+    // }
+
+    // 2. 커스텀메서드를 선언하면서 화살표함수를 이용해 'bind'작업 수행
+    handleIncrease = () => {
+      console.log(this);
+    }
+    handleDecrease = () => {
+      console.log(this);
+    }
+    // Counter {props: {…}, context: {…}, refs: {…}, updater: {…}, handleIncrease: ƒ, …}
+    render() {
+    return (
+      <div>
+        <h2>0</h2>
+        <button onClick={this.handleIncrease}>+1</button>
+        <button onClick={this.handleDecrease}>-1</button>
+      </div>
+    );
+  }
+  }
+  ```
+- 상태 관리하기(state)
+  - 클래스형 컴포넌트에서 상태관리를 할 때는 `state`를 사용
+  - `state` 선언 : `constructor` 내부에서 `this.state` 설정, 화살표함수를 이용할 때는 곧바로 `state`를 선언해도 됨
+  - 상태를 업데이트 할 때는 `this.setState` 함수 사용
+  ```javascript
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     counter: 0,
+  //   };
+  // }
+  ...
+  state = {
+    counter: 0,
+  };
+  handleIncrease = () => {
+    // 상태 업데이트 함수
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+  };
+  handleDecrease = () => {
+    this.setState({
+      counter: this.state.counter - 1,
+    });
+  };
+  ```
+- `setState` 함수형 업데이트
+  - 함수형 업데이트는 한 함수에서 `setState`를 여러번 사용해야 하는 경우에 유용하다.
+  - 예를 들어 `handleIncrease` 함수에서 `counter`를 증가시키는 `setState`함수를 두번 작성하면
+  ```javascript
+  handleIncrease = () => {
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+  };
+  ```
+  - 기존 값에 1을 더해주는 함수를 두번 실행시키지만 그 결과가 2를 더해주지는 않는다 (0에서 1이 되는 함수를 두번 실행)
+  - 함수형 업데이트를 사용하면 `this`를 참조하지 않고도 최신 상태를 반영하므로 기존 값에서 2를 더한 결과가 나타난다 
+  ```javascript
+  handleIncrease = () => {
+    this.setState((state) => ({
+      counter: state.counter + 1,
+    }));
+    this.setState((state) => ({
+      counter: state.counter + 1,
+    }));
+  };
+  ```
+  - 만약, 상태가 업데이트 되고 나서 어떤 작업을 추가로 수행하고 싶다면 `setState`의 두 번째 파라미터에 콜백함수를 넣어줄 수도 있다.
 
 ## 재사용
 
