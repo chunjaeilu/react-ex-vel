@@ -1330,11 +1330,12 @@ https://react.vlpt.us/
     // 2. 커스텀메서드를 선언하면서 화살표함수를 이용해 'bind'작업 수행
     handleIncrease = () => {
       console.log(this);
+      // {Counter {props: {…}, context: {…}, refs: {…}, updater: {…}, handleIncrease: ƒ, …}}
     }
     handleDecrease = () => {
       console.log(this);
     }
-    // Counter {props: {…}, context: {…}, refs: {…}, updater: {…}, handleIncrease: ƒ, …}
+    
     render() {
     return (
       <div>
@@ -1413,6 +1414,144 @@ https://react.vlpt.us/
     );
   };
   ```
+
+## 23.02.14(화)
+### 1-25. LifeCycle Method (생명주기 메서드)
+> 리액트 컴포넌트에 존재하는 LifeCycle(생명주기)의 정의를 이해할 수 있다
+>
+> 생명주기에 따른 메서드의 정의와 역할을 이해할 수 있다
+
+#### LifeCycle(생명주기) 
+> **모든 컴포넌트는 라이프사이클(생명주기)가 존재하며, 컴포넌트의 수명은 페이지에 렌더링되기 전인 `준비과정`에서 시작하여 페이지에서 `사라질 때` 끝난다**
+- 컴포넌트를 처음 렌더링 할 때 어떤 작업을 처리해야 하거나 컴포넌트를 업데이트 하기 전후로 어떤 작업을 처리해야 할 수도 있고, 또 불필요한 업데이트를 방지해야 할 수도 있다
+- 이때 사용하는 것이 라이프사이클 메서드
+- 라이프사이클 메서드는 클래스형 컴포넌트에서만 사용(함수형 컴포넌트는 사용 불가, 대신 Hook을 사용하여 비슷한 작업을 처리할 수 있음)
+
+#### LifeCycle Method(생명주기 메서드)
+> 생명주기 메서드는 총 9개가 있으며, 이것을 3단계로 구분할 수 있다
+> 
+><img src ='https://i.imgur.com/cNfpEph.png'>
+
+  - Mount(마운트) : 페이지에 컴포넌트가 나타남(렌더링)
+    - constructor
+    - getDerivedStateFromProps
+    - render
+    - componentDidMount
+  - Update(업데이트) : 컴포넌트 정보를 업데이트 (리렌더링)
+    - getDerivedStateFromProps
+    - shouldComponentUpdate
+    - render
+    - getSnapshotBeforeUpdate
+    - componentDidUpdate
+  - Unmount(언마운트) : 페이지에서 컴포넌트가 사라짐
+    - componentWillUnmount
+
+
+#### Mount(마운트)
+<p align='center'><img src="https://thebook.io/img/080203/173.jpg" width='300'><br> 마운트시 호출하는 메서드</p>
+
+##### constructor
+- 컴포넌트의 생성자 메서드, 컴포넌트가 만들어지면 가장 먼저 실행됨
+- `this.props`, `this.state`에 접근하여 초기값을 설정하고 이벤트 처리 메서드를 바인딩 하기 위해 사용
+- 파라미터 호출함수 `super(props)`를 반드시 첫 줄에 작성해주어야 함
+  ```javascript
+  constructor(props) {
+    super(props);
+    console.log("constructor");
+  }
+  ```
+##### getDerivedStateFromProps
+- 렌더가 시작되기 전에 `props`에 의존하여 `state`를 변경할 때 사용하는 메서드
+- 그 이후 컴포넌트가 리렌더링(업데이트) 되기 전에도 매번 실행된다. (불필요한 실행이 반복될 수 있으므로 사용을 제한하는것이 좋다.)
+- 메서드 앞에 `static`을 필요로 하고, 이 안에서는 `this`를 조회할 수 없고 다른 클래스메서드에도 접근할 수 없음
+- 특정 객체를 반환하면 해당 객체 안의 내용들이 컴포넌트의 `state`로 저장됨
+- 상태를 바꾸고싶지 않다면 `null`을 반환
+  ```javascript
+  static getDerivedStateFromProps(nextProps, prevState) {
+    console.log("getDerivedStateFromProps");
+    if (nextProps.color !== prevState.color) {
+      return { color: nextProps.color };
+    }
+    return null;
+  }
+  ```
+##### render
+- 준비한 UI를 렌더링 하는 메서드
+- render 메서드 내부의 `return` 안의 내용이 렌더링 된다
+
+##### componentDidMount
+- 컴포넌트의 첫 번째 렌더링이 마치고 나면 호출되는 메서드(이 메서드가 호출되는 시점은 컴포넌트가 화면에 나타난 상태)
+- 데이터 상호작용을 위한 외부데이터를 로드 할 때 주로 사용
+  - 다른 자바스크립트 라이브러리 또는 프레임워크 함수를 호출
+  - DOM을 사용해야 하는 외부 라이브러리 연동
+  - 이벤트 등록, `setTimeout`, `setInterval`, 네트워크 요청 같은 비동기 작업
+  - `axios`, `fetch` 등을 통하여 ajax 요청을 하거나 DOM의 속성을 읽거나 직접 변경하는 작업  
+
+#### Update(업데이트)
+> props가 바뀔 때
+>
+> state가 바뀔 때
+>
+> 부모 컴포넌트가 리렌더링 될 때
+>
+> `this.forceUpdate`로 강제로 렌더링을 트리거 할 때
+
+<p align='center'><img src="https://thebook.io/img/080203/174.jpg" width='300'><br> 업데이트시 호출하는 메서드</p>
+
+##### getDerivedStateFromProps
+- 위에 서술한 바와 같이 컴포넌트가 리렌더링(업데이트) 될 때마다 매번 실행된다.
+
+##### shouldComponentUpdate
+- 컴포넌트가 리렌더링 할지 말지를 결정하는 메서드
+  - true 반환 : 다음 라이프사이클 메서드를 계속 실행
+  - false 반환 : 작업을 중지(리렌더링x)
+- 주로 최적화 할 때 사용하는 메서드. 함수형 컴포넌트에서 `React.memo`와 비슷한 역할 (불필요한 리렌더링 방지)
+- 리액트 공식문서에서는 이 메서드보다는 `PureComponent` 사용을 권장함
+  ```javascript
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("shouldComponentUpdate", nextProps, nextState);
+    // 숫자의 마지막 자리가 4면 리렌더링하지 않습니다
+    return nextState.number % 10 !== 4;
+  }
+  ```
+##### render
+- UI를 렌더링 하는 메서드, 변경된 내용을 화면에 보여줘야 하므로 업데이트 시에도 호출된다
+  
+##### getSnapshotBeforeUpdate
+- 컴포넌트의 변화를 DOM에 반영하기 직전에 호출
+- 변화가 일어나기 직전의 DOM 상태를 가져와서 특정값을 반환하면 그 다음 발생하는 `componentDidUpdate`함수에서 세 번째 파라미터 `snapshot`값으로 전달됨
+- 업데이트 하기 직전의 값을 참고할 일이 있을 때 사용(스크롤바의 위치 유지 등)
+- 사용 빈도가 많지는 않지만 함수형 컴포넌트 Hook에서 이 메서드를 대체할 기능이 아직 없다
+  ```javascript
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    console.log("getSnapshotBeforeUpdate");
+    if (prevProps.color !== this.props.color) {
+      return this.myRef.style.color;
+    }
+    return null;
+  }
+  ```
+
+##### componentDidUpdate
+- 리렌더링을 마친 후 화면에 원하는 변화가 모두 반영되고 난 뒤 호출되는 메서드
+- 3번째 파라미터로 `getSnapshotBeforeUpdate`에서 반환한 값을 조회할 수 있다.
+- 업데이트가 끝난 이후이므로, DOM관련 처리를 해도 괜찮다
+- `prevProps` 또는 `prevState`를 통해 업데이트 이전에 가졌던 데이터에 접근 가능하다
+```javascript
+componentDidUpdate(prevProps, prevState, snapshot) {
+  console.log("componentDidUpdate", prevProps, prevState);
+  if (snapshot) {
+    console.log("업데이트 되기 직전 색상: ", snapshot);
+  }
+}
+```
+
+#### Unmount(언마운트)
+##### componentWillUnmount
+- 컴포넌트가 화면에서 사라지기 직전에 호출되는 메서드
+- DOM에 직접 등록했던 이벤트를 제거하고, 만약 `componentDidMount`에서 등록한 `setTimeout`, `setInterval`과 같은 이벤트가 있다면 여기서 `clearTimeout`을 통해 제거해준다.
+- 만약 외부 라이브러리를 사용했고, 해당 라이브러리에 `dispose` 기능이 있다면 여기서 호출한다.
+
 
 ## 재사용
 
