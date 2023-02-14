@@ -39,12 +39,16 @@ class Counter extends Component {
     fixed: 1,
   };
   handleIncrease = () => {
-    this.setState((state) => ({
-      counter: state.counter + 1,
-    }));
-    this.setState((state) => ({
-      counter: state.counter + 1,
-    }));
+    this.setState(
+      {
+        // state 업데이트
+        counter: this.state.counter + 1,
+      },
+      () => {
+        // 이전 값이 아닌 업데이트 된 state의 counter 값이 콘솔에 출력된다
+        console.log(this.state.counter);
+      }
+    );
   };
   handleDecrease = () => {
     this.setState((state) => ({

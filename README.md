@@ -1399,6 +1399,20 @@ https://react.vlpt.us/
   };
   ```
   - 만약, 상태가 업데이트 되고 나서 어떤 작업을 추가로 수행하고 싶다면 `setState`의 두 번째 파라미터에 콜백함수를 넣어줄 수도 있다.
+  ```javascript
+  handleIncrease = () => {
+    this.setState(
+      {
+        // state 업데이트
+        counter: this.state.counter + 1,
+      },
+      () => {
+        // 이전 값이 아닌 업데이트 된 state의 counter 값이 콘솔에 출력된다
+        console.log(this.state.counter);
+      }
+    );
+  };
+  ```
 
 ## 재사용
 
