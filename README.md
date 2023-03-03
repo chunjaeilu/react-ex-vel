@@ -141,12 +141,23 @@ https://react.vlpt.us/
 - useRef로 관리되는 변수는 값이 바뀌어도 컴포넌트가 리렌더링 되지 않는다.
 - 리액트 컴포넌트에서 변수의 상태를 변경하는 함수를 호출하고 나서 리렌더링 이후에 업데이트된 상태를 조회할 수 있으나, useRef로 관리되는 변수는 렌더링 없이 설정 후 바로 조회할 수 있다.
 - Ref로 관리할 변수 생성 : `const nextId = useRef(4);`
+  - `useRef()`를 사용할 때 파마미터 값을 넣어주면 해당 값이 `.current`의 기본값이 됨
+  - 해당 값을 조회하거나 수정할 때는 `.current` 값을 조회하면 됨
+  ```javascript
+  // onCreate 함수를 실행할 때마다 nextId 값을 1씩 증가
+  const onCreate = () => {
+    ...
+    nextId.current += 1;
+  };
+  ```
 
 ### 1-13. 배열에 항목 추가하기
 > UserList_02.js, CreateUser_01.js
 >
 > 스프레드 연산자로 배열에 새로운 항목 추가 (Create)
+> 
 > Create함수 props로 전달하고 자식 컴포넌트에서 항목 추가 요청
+> 
 > `useState`로 배열 관리
 
 - State로 관리되는 변수 배열에 변화를 줄 때는 불변성을 지켜줘야 하기 때문에 `push`,`splice`,`sort` 등의 함수를 사용하면 안됨
@@ -885,8 +896,8 @@ https://react.vlpt.us/
 > App_02.js, useInputs.js, useInputs_01.js
 >
 > 컴포넌트에서 반복되는 로직을 커스텀 Hooks로 만들어 쉽게 재사용 할 수 있다.
-
-- 커스텀 Hooks는 src 디렉토리에 hooks 라는 디렉토리를 만들고, 그 안에 useSomething.js 파일로 관리한다.
+>
+> 커스텀 Hooks는 주로 src 디렉토리에 hooks 라는 디렉토리를 만들고, 그 안에 useSomething.js 파일로 관리한다.
 
 #### input을 관리하는 커스텀 Hook을 만들어보자
 - root/src/hooks/ 디렉토리에 useInputs.js 파일을 생성한다
@@ -1560,6 +1571,8 @@ componentDidUpdate(prevProps, prevState, snapshot) {
 > Inputs.js
 >
 > Context API를 활용해프로젝트 안에서 전역적으로 사용하는 값을 관리할 수 있다
+
+[코드 확인](https://github.com/chunjaeilu/react-ex-vel.git)
 
 <details>
   <summary>코드 보기</summary>
